@@ -15,9 +15,18 @@ export const getStorageData = async (key: string) => {
   }
 
   const result = JSON.parse(data);
-  console.log(result);
 
   return result;
+};
+
+export const getAllKeys = async () => {
+  const data = await AsyncStorage.getAllKeys();
+
+  if (!data) {
+    return null;
+  }
+
+  return data;
 };
 
 export const removeStorageData = async (key: string) => {
