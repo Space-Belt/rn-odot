@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {
   Image,
@@ -10,13 +10,34 @@ import {
   View,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import frame from '../assets/images/Frame.png';
+
 import arrow from '../assets/images/arrow.png';
 
 import moment from 'moment';
-import {TodoItem, TodoList} from '../types/todos';
+import {TodoItem, WholeTodoList} from '../types/todos';
 import AddTaskHeader from '../components/Headers/AddTaskHeader';
+import {getAllKeys, getStorageData} from '../lib/storage-helper';
 
+// const temp = {
+//   2024: {
+//     02: {
+//       24: [{todo: '할일', done: true}],
+//     },
+//   },
+// };
+
+// const data = {
+//   'todos-2024-01': {},
+//   'todos-2024-02': {},
+//   'todos-2024-03': {},
+//   'todos-2024-04': {},
+
+// };
+
+// const today = moment().format('YYYY/MM/DD');
+
+// const [year, month, date] = today.split('/');
+// temp[year][month][date];
 /**
  {
   2024: {
@@ -47,70 +68,71 @@ import AddTaskHeader from '../components/Headers/AddTaskHeader';
   }
  }
  */
+
+// type Props = {
+//   // selectedData?: {
+//   selectedYear: string;
+//   selectedMonth: string;
+//   selectedDate: string;
+//   // };
+// };
+
 const AddTaskScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute();
 
-  const today = moment().format('YYYY/MM/DD');
-  const year = today.slice(0, 5);
-  const month = today.slice(5, 7);
-  const day = today.slice(8, 10);
+  const {selectedYear, selectedMonth, selectedDate} = route.params;
 
   const [dataExist, setDataExist] = useState<boolean>(false);
 
-  const [todoGroup, setTodoGroup] = useState<any>();
+  const [todoGroup, setTodoGroup] = useState<WholeTodoList>({});
 
   const [todo, setTodo] = useState<string>('');
   const [todoList, setTodoList] = React.useState<TodoItem[]>([]);
 
-  const getData = async () => {
-    try {
-      const value = await AsyncStorage.getItem('to-do');
+  const addTodoList = () => {
+    let clonedData: WholeTodoList = todoGroup;
 
-      if (value !== null) {
-        //   // value previously stored
-        let temp = JSON.parse(value);
-        //   console.log('실행됨');
-        //   console.log(value);
-        //   setTodoList(temp);
-
-        if (temp[year] !== undefined) {
-          if (temp[year][month] !== undefined) {
-            if (temp[year][month][day] !== undefined) {
-            } else {
-            }
-          } else {
-          }
+    if (Object.keys(clonedData).length !== 0) {
+      if (todo.length > 0) {
+        if (clonedData[selectedYear] !== null) {
         } else {
+          clonedData[selectedYear] = {};
+        }
+
+        if (clonedData[selectedYear][selectedMonth] !== undefined) {
+        } else {
+          clonedData[selectedYear][selectedMonth] = {};
         }
 
         if (
-          temp &&
-          temp[month] !== undefined &&
-          temp[month][day].todos !== undefined &&
-          temp[month][day].todos !== null
+          clonedData[selectedYear][selectedMonth][selectedDate] !== undefined
         ) {
-          setTodoList(temp[month][day].todos);
+          clonedData[selectedYear][selectedMonth][selectedDate].push({
+            todo: todo,
+            done: false,
+          });
+          AsyncStorage.setItem('todos', JSON.stringify(clonedData));
+          navigation.navigate('TodoListGroupScreen');
+        } else {
+          clonedData[selectedYear][selectedMonth][selectedDate] = [
+            {todo: todo, done: false},
+          ];
+          AsyncStorage.setItem('todos', JSON.stringify(clonedData));
+          navigation.navigate('TodoListGroupScreen');
         }
       }
-    } catch (e) {
-      // error reading value
-    }
-  };
-
-  const addTodoList = async () => {
-    if (todo.length > 0) {
-      // let clonedData = [...todoList];
-      // clonedData.push({
-      //   name: todo,
-      //   check: false,
-      // });
-      // let tempData = JSON.stringify(clonedData);
-      // await AsyncStorage.setItem(, tempData);
-      if (todoList.length > 0) {
-        let clonedData = [...todoList];
-      }
-
-      navigation.goBack();
+    } else {
+      clonedData[selectedYear] = {};
+      clonedData[selectedYear][selectedMonth] = {};
+      clonedData[selectedYear][selectedMonth][selectedDate] = [
+        {
+          todo: todo,
+          done: false,
+        },
+      ];
+      AsyncStorage.setItem('todos', JSON.stringify(clonedData));
+      navigation.navigate('TodoListGroupScreen');
     }
   };
 
@@ -119,7 +141,19 @@ const AddTaskScreen = () => {
   };
 
   useEffect(() => {
+    const getData = async () => {
+      let results = await getStorageData('todos');
+
+      if (results === null) {
+        setTodoGroup({});
+      } else {
+        setTodoGroup(results);
+      }
+    };
+
     getData();
+
+    getAllKeys();
   }, []);
 
   return (
@@ -134,19 +168,8 @@ const AddTaskScreen = () => {
           style={styles.todoInput}
         />
 
-        <View
-          style={{
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <Image
-            source={arrow}
-            style={{
-              width: 100,
-              height: 100,
-            }}
-          />
+        <View style={styles.arrowPhoto}>
+          <Image source={arrow} style={styles.arrowImg} />
         </View>
         <TouchableOpacity onPress={addTodoList}>
           <View style={styles.buttonColor}>
@@ -190,6 +213,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 17,
     fontWeight: '600',
     elevation: 5, // 안드로이드용
+  },
+  arrowPhoto: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  arrowImg: {
+    width: 100,
+    height: 100,
   },
   buttonColor: {
     height: 45,
