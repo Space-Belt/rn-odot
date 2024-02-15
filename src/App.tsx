@@ -7,7 +7,6 @@
 
 import React from 'react';
 import {
-  Button,
   Image,
   SafeAreaView,
   ScrollView,
@@ -76,7 +75,7 @@ function App(): React.JSX.Element {
               source={require('./assets/images/unchecked.png')}
             />
           )}
-          <View>
+          <View style={{marginLeft: 5}}>
             <Text>{todo.name}</Text>
           </View>
         </View>
@@ -118,11 +117,6 @@ function App(): React.JSX.Element {
         </View>
         {/* 투두 부분 */}
         <ScrollView style={{paddingHorizontal: 25}}>
-          {/* <ScrollView
-            contentContainerStyle={{
-              backgroundColor: 'red',
-              flex: 1,
-            }}></ScrollView> */}
           {odotList.length > 0 ? (
             odotList.map((el: Todo, i: number) => renderList(el, i))
           ) : (
