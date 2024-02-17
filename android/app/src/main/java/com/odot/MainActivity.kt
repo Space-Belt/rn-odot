@@ -1,5 +1,10 @@
 package com.odot
 
+/**
+*
+*24.02.15 번들추가
+*/
+import android.os.Bundle;
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
@@ -13,6 +18,10 @@ class MainActivity : ReactActivity() {
    */
   override fun getMainComponentName(): String = "odot"
 
+  // 24.02.15 번들 추가
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(null)
+  }
   /**
    * Returns the instance of the [ReactActivityDelegate]. We use [DefaultReactActivityDelegate]
    * which allows you to enable New Architecture with a single boolean flags [fabricEnabled]
