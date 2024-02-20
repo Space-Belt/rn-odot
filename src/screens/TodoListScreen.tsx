@@ -9,17 +9,21 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import space from '../assets/images/space.png';
-import {useNavigation} from '@react-navigation/native';
+import hamburger from '../assets/images/hamburger.png';
 
-interface Todo {
+import {useIsFocused, useNavigation} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+export interface Todo {
   name: string;
   check: boolean;
 }
 
-const TodoListScreen = () => {
+const TodoListScreen = ({route}) => {
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
 
   // 이름
   const [myName, setMyName] = React.useState<string>('SpaceBelt');
@@ -30,12 +34,7 @@ const TodoListScreen = () => {
   // 할일 리스트
   const [odotList, setOdotList] = React.useState<Todo[]>([]);
 
-  const handleChangeValue = (text: string) => {
-    setTodo(text);
-  };
-
   const handlePlusClick = () => {
-    navigation.navigate('MainStack');
     // let clonedOdotList: Todo[] = [...odotList];
     // if (todo.length > 0) {
     //   clonedOdotList.push({
@@ -45,6 +44,28 @@ const TodoListScreen = () => {
     // }
     // setOdotList(clonedOdotList);
     // setTodo('');
+
+    navigation.navigate('AddTaskScreen');
+  };
+
+  const getData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('to-do');
+      if (value !== null) {
+        // value previously stored
+        let temp = JSON.parse(value);
+        console.log('실행됨');
+        console.log(value);
+        setOdotList(temp);
+        // setTodoGroups(value);
+      }
+    } catch (e) {
+      // error reading value
+    }
+  };
+
+  const handleHamburgerBar = () => {
+    navigation.navigate('TodoListGroupScreen');
   };
 
   const handleCheckTodoList = (i: number) => {
@@ -79,38 +100,78 @@ const TodoListScreen = () => {
       </TouchableOpacity>
     );
   };
+
+  useEffect(() => {
+    if (isFocused) {
+      getData();
+    }
+  }, [isFocused]);
+
+  const totalCount = odotList.length;
+  const doneCount = odotList.filter(list => list.check).length;
+  const percentage = (doneCount / totalCount) * 100;
+
+  const percentStyle = [styles.percentage, {width: `${percentage}%`}];
+
   return (
     <View style={styles.wrapper}>
       <SafeAreaView style={{flex: 1}}>
         {/* 상단 */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.nameText}>Hello! {myName} 🧞‍♂️</Text>
-          </View>
-          <View>
             <Image source={space} style={styles.profileImg} />
           </View>
+          <View>
+            <Text style={styles.nameText}>ODOT</Text>
+          </View>
+          <TouchableOpacity onPress={handleHamburgerBar}>
+            <View>
+              <Image source={hamburger} style={styles.profileImg} />
+            </View>
+          </TouchableOpacity>
         </View>
         {/* 입력부분 */}
-        <View style={styles.textInputArea}>
-          <View style={styles.inputBox}>
-            <TextInput
-              value={todo}
-              onChangeText={text => handleChangeValue(text)}
-              placeholder="tell me what you gonna do today!"
-              style={styles.todoInput}
-            />
+        <View
+          style={{
+            marginHorizontal: 20,
+            padding: 10,
+            borderRadius: 10,
+            marginTop: 10,
+            backgroundColor: '#ffffff',
+            shadowColor: '#000',
+            shadowOffset: {width: 0, height: 1.95},
+            shadowOpacity: 0.25,
+            shadowRadius: 1.75,
+            elevation: 5, // 안드로이드용
+          }}>
+          <Text>progress</Text>
+          <View
+            style={{
+              height: 10,
+              borderRadius: 10,
+              marginVertical: 10,
+
+              flexDirection: 'row',
+              position: 'relative',
+              backgroundColor: '#D9D9D9',
+            }}>
+            <View
+              style={{
+                position: 'relative',
+                width: '100%',
+                height: 10,
+              }}>
+              <View style={percentStyle} />
+            </View>
           </View>
-          <TouchableHighlight
-            onPress={handlePlusClick}
-            style={{borderRadius: 50, width: 40, height: 40}}
-            underlayColor="transparent">
-            <Image
-              style={styles.plusBtn}
-              source={require('../assets/images/plusButton.png')}
-            />
-          </TouchableHighlight>
+          <View>
+            <Text
+              style={{
+                color: '#C4C4C4',
+              }}>{`${doneCount} / ${totalCount}`}</Text>
+          </View>
         </View>
+
         {/* 투두 부분 */}
         <ScrollView style={{paddingHorizontal: 25}}>
           {odotList.length > 0 ? (
@@ -119,6 +180,22 @@ const TodoListScreen = () => {
             <></>
           )}
         </ScrollView>
+        <TouchableHighlight
+          onPress={handlePlusClick}
+          style={{
+            position: 'absolute',
+            borderRadius: 50,
+            width: 40,
+            height: 40,
+            right: 10,
+            bottom: 10,
+          }}
+          underlayColor="transparent">
+          <Image
+            style={styles.plusBtn}
+            source={require('../assets/images/plusButton.png')}
+          />
+        </TouchableHighlight>
       </SafeAreaView>
     </View>
   );
@@ -130,7 +207,7 @@ const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
     height: '100%',
-    paddingVertical: 25,
+    paddingVertical: 10,
   },
   header: {
     flexDirection: 'row',
@@ -155,7 +232,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
     paddingHorizontal: 25,
   },
-  inputBox: {flex: 1, marginRight: 20},
+  inputBox: {flex: 1},
   todoInput: {
     paddingHorizontal: 10,
     paddingVertical: 10,
@@ -171,6 +248,8 @@ const styles = StyleSheet.create({
   plusBtn: {
     width: 40,
     height: 40,
+    position: 'absolute',
+    right: 0,
   },
   todo: {
     flexDirection: 'row',
@@ -187,5 +266,13 @@ const styles = StyleSheet.create({
   checkImg: {
     width: 25,
     height: 25,
+  },
+
+  percentage: {
+    position: 'absolute',
+    width: '0%',
+    height: 10,
+    borderRadius: 10,
+    backgroundColor: '#FF7461',
   },
 });
