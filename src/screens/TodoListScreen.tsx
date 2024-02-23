@@ -15,11 +15,7 @@ import hamburger from '../assets/images/hamburger.png';
 
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-export interface Todo {
-  name: string;
-  check: boolean;
-}
+import {TodoItem} from '../types/todos';
 
 const TodoListScreen = ({route}) => {
   const navigation = useNavigation();
@@ -32,19 +28,9 @@ const TodoListScreen = ({route}) => {
   const [todo, setTodo] = React.useState<string>('');
 
   // 할일 리스트
-  const [odotList, setOdotList] = React.useState<Todo[]>([]);
+  const [odotList, setOdotList] = React.useState<TodoItem[]>([]);
 
   const handlePlusClick = () => {
-    // let clonedOdotList: Todo[] = [...odotList];
-    // if (todo.length > 0) {
-    //   clonedOdotList.push({
-    //     check: false,
-    //     name: todo,
-    //   });
-    // }
-    // setOdotList(clonedOdotList);
-    // setTodo('');
-
     navigation.navigate('AddTaskScreen');
   };
 
@@ -69,12 +55,12 @@ const TodoListScreen = ({route}) => {
   };
 
   const handleCheckTodoList = (i: number) => {
-    let clonedOdotList: Todo[] = [...odotList];
+    let clonedOdotList: TodoItem[] = [...odotList];
     clonedOdotList[i].check = !clonedOdotList[i].check;
     setOdotList(clonedOdotList);
   };
 
-  const renderList = (todo: Todo, i: number) => {
+  const renderList = (todo: TodoItem, i: number) => {
     return (
       <TouchableOpacity onPress={() => handleCheckTodoList(i)}>
         <View
@@ -122,7 +108,10 @@ const TodoListScreen = ({route}) => {
             <Image source={space} style={styles.profileImg} />
           </View>
           <View>
-            <Text style={styles.nameText}>ODOT</Text>
+            <Image
+              source={require('../assets/images/ODOT.png')}
+              style={styles.logo}
+            />
           </View>
           <TouchableOpacity onPress={handleHamburgerBar}>
             <View>
@@ -175,7 +164,7 @@ const TodoListScreen = ({route}) => {
         {/* 투두 부분 */}
         <ScrollView style={{paddingHorizontal: 25}}>
           {odotList.length > 0 ? (
-            odotList.map((el: Todo, i: number) => renderList(el, i))
+            odotList.map((el: TodoItem, i: number) => renderList(el, i))
           ) : (
             <></>
           )}
@@ -214,15 +203,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 25,
+    paddingVertical: 20,
   },
-
+  logo: {width: 41, height: 20, resizeMode: 'center'},
   nameText: {
     fontSize: 20,
     fontWeight: '600',
   },
   profileImg: {
-    width: 35,
-    height: 35,
+    width: 25,
+    height: 25,
   },
   textInputArea: {
     // flex: 1,
