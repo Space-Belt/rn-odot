@@ -1,6 +1,8 @@
 import {
+  FlatList,
   Image,
   ScrollView,
+  SectionList,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -13,66 +15,43 @@ import {useNavigation} from '@react-navigation/native';
 import frame from '../assets/images/Frame.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import TodoListScreen, {Todo} from './TodoListScreen';
+import FlatListExample from '../components/FlatListExample';
+import SectionListExample from '../components/SectionListExample';
 
 // - 굳이 필요 없을 것 같아서 바텀탭은 안넣었음
 // - 맨 오른쪽에 있는 TODOS 스크린은 빈 화면으로 구현하면 됨
 // - 플러스 버튼 눌렀을 때는 우측에 있는 NEW TASKS 스크린으로 navigate 되어야 함(이 버튼은 항상 같은 위치에 플로팅 되는 버튼임)
 // - todo 체크되면 -> progress bar가 퍼센티지만큼 채워져야 함(반대는 그만큼 퍼센티지 줄어듦)
-interface TodoGroup {}
+export interface Item {
+  id: number;
+  title: string;
+  date: string;
+}
 
-const TodoListGroupScreen = ({navigation}) => {
-  // const localStorage = useAsyncStorage();
-  // const navigation = useNavigation();
+export interface ItemType {
+  id: string;
+  name: string;
+}
 
-  const [todoGroups, setTodoGroups] = useState<[Todo[]]>([[]]);
+export interface SectionType {
+  title: string;
+  data: ItemType[];
+}
+
+const TodoListGroupScreen = () => {
+  const navigation = useNavigation();
 
   const handleClick = () => {
     navigation.goBack();
   };
 
-  const getData = async () => {
-    try {
-      const value = await AsyncStorage.getItem('to-do');
-      if (value !== null) {
-        // value previously stored
-        let temp = JSON.parse(value);
-        console.log('dfdfdfdf');
-        console.log(temp);
-        setTodoGroups(temp);
-        // setTodoGroups(value);
-      }
-    } catch (e) {
-      // error reading value
+  const handleBtn = (type: 'a' | 'b') => {
+    if (type === 'a') {
+      navigation.navigate('FlatListScreen');
+    } else {
+      navigation.navigate('SectionListScreen');
     }
   };
-
-  const addTodoList = () => {
-    let clonedData = [...todoGroups];
-    // clonedData.push([]);
-    // let tempData = JSON.stringify(clonedData);
-    // AsyncStorage.setItem('to-do', tempData);
-    // navigation.navigate('TodoStack, { data: "dfdfdf"});
-    console.log('dfdfdf');
-    navigation.navigate('TodoStack', {
-      data: 11,
-    });
-    // navigation.navigate('TodoStack', {
-    //   dfdff: '111',
-    // });
-  };
-
-  const gotoList = (index: number) => {
-    navigation.navigate('TodoStack', {
-      data: JSON.stringify(
-        // clonedData[index]
-        [{name: 'dfdf', check: false}],
-      ),
-    });
-  };
-
-  useEffect(() => {
-    getData();
-  }, []);
 
   return (
     <SafeAreaView style={{flex: 1}}>
@@ -93,31 +72,19 @@ const TodoListGroupScreen = ({navigation}) => {
             }}></View>
         </View>
         {/* 영역 */}
-        <ScrollView style={{flex: 1}}>
-          <View style={styles.contentArea}>
-            {todoGroups.map((todoGroup, index) => {})}
-            <View style={{paddingHorizontal: 5, paddingVertical: 5}}></View>
-          </View>
-        </ScrollView>
-        {/* <TouchableOpacity onPress={addTodoList}>
-          <View
-            style={{
-              height: 60,
-              backgroundColor: 'green',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: 15,
-            }}>
-            <Text
-              style={{
-                fontWeight: '700',
-                fontSize: 20,
-                color: '#efefef',
-              }}>
-              Add Task
-            </Text>
-          </View>
-        </TouchableOpacity> */}
+        {/* <FlatListExample /> */}
+        <View style={styles.buttonWrapper}>
+          <TouchableOpacity
+            onPress={() => handleBtn('a')}
+            style={styles.centerBtn}>
+            <Text style={styles.btnText}>섹션리스트</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => handleBtn('b')}
+            style={styles.centerBtn}>
+            <Text style={styles.btnText}>플랫리스트</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -130,10 +97,11 @@ const styles = StyleSheet.create({
     flex: 1,
     position: 'relative',
     paddingHorizontal: 10,
-    paddingVertical: 10,
   },
   header: {
-    height: '10%',
+    // height: '10%',
+    paddingVertical: 10,
+    marginBottom: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -143,14 +111,21 @@ const styles = StyleSheet.create({
     width: 25,
     height: 25,
   },
-  contentArea: {
-    flex: 1,
-
-    backgroundColor: 'red',
+  buttonWrapper: {
+    // flex: 1,
+    gap: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  addTodoBtn: {
-    flex: 1,
-    backgroundColor: 'blue',
-    height: '10%',
+  centerBtn: {
+    padding: 10,
+    backgroundColor: 'skyblue',
+    borderRadius: 10,
+  },
+  btnText: {
+    fontWeight: '800',
+    fontSize: 18,
+    color: 'white',
   },
 });
