@@ -4,6 +4,8 @@ import {StyleSheet} from 'react-native';
 import TodoListGroupScreen from '../screens/TodoListGroupScreen';
 import TodoListScreen from '../screens/TodoListScreen';
 import AddTaskScreen from '../screens/AddTaskScreen';
+import FlatListScreen from '../screens/FlatListScreen';
+import SectionListScreen from '../screens/SectionListScreen';
 
 const MainStack = createStackNavigator();
 
@@ -17,6 +19,11 @@ const MainStackNavigator = () => {
       <MainStack.Screen
         name="TodoListGroupScreen"
         component={TodoListGroupScreen}
+      />
+      <MainStack.Screen name="FlatListScreen" component={FlatListScreen} />
+      <MainStack.Screen
+        name="SectionListScreen"
+        component={SectionListScreen}
       />
     </MainStack.Navigator>
   );
