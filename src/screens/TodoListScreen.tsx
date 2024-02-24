@@ -16,6 +16,7 @@ import hamburger from '../assets/images/hamburger.png';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {TodoItem} from '../types/todos';
+import MainHeader from '../components/Headers/MainHeader';
 
 const TodoListScreen = ({route}) => {
   const navigation = useNavigation();
@@ -48,10 +49,6 @@ const TodoListScreen = ({route}) => {
     } catch (e) {
       // error reading value
     }
-  };
-
-  const handleHamburgerBar = () => {
-    navigation.navigate('TodoListGroupScreen');
   };
 
   const handleCheckTodoList = (i: number) => {
@@ -103,22 +100,7 @@ const TodoListScreen = ({route}) => {
     <View style={styles.wrapper}>
       <SafeAreaView style={{flex: 1}}>
         {/* 상단 */}
-        <View style={styles.header}>
-          <View>
-            <Image source={space} style={styles.profileImg} />
-          </View>
-          <View>
-            <Image
-              source={require('../assets/images/ODOT.png')}
-              style={styles.logo}
-            />
-          </View>
-          <TouchableOpacity onPress={handleHamburgerBar}>
-            <View>
-              <Image source={hamburger} style={styles.profileImg} />
-            </View>
-          </TouchableOpacity>
-        </View>
+        <MainHeader />
         {/* 입력부분 */}
         <View
           style={{
@@ -198,22 +180,7 @@ const styles = StyleSheet.create({
     height: '100%',
     paddingVertical: 10,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 25,
-    paddingVertical: 20,
-  },
-  logo: {width: 41, height: 20, resizeMode: 'center'},
-  nameText: {
-    fontSize: 20,
-    fontWeight: '600',
-  },
-  profileImg: {
-    width: 25,
-    height: 25,
-  },
+
   textInputArea: {
     // flex: 1,
     flexDirection: 'row',

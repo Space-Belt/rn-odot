@@ -15,8 +15,8 @@ import {useNavigation} from '@react-navigation/native';
 import frame from '../assets/images/Frame.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import TodoListScreen, {Todo} from './TodoListScreen';
-import FlatListExample from '../components/FlatListExample';
-import SectionListExample from '../components/SectionListExample';
+import FlatListExample from '../components/TodoFlatList/FlatListExample';
+import SectionListExample from '../components/TodoSectionList/SectionListExample';
 
 // - 굳이 필요 없을 것 같아서 바텀탭은 안넣었음
 // - 맨 오른쪽에 있는 TODOS 스크린은 빈 화면으로 구현하면 됨
