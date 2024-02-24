@@ -54,37 +54,26 @@ const TodoListGroupScreen = () => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
-      <View style={styles.wrapper}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={{borderRadius: 50, width: 25, height: 25}}
-            // underlayColor="transparent"
-            onPress={() => handleClick()}>
-            <Image source={frame} style={styles.backImg} />
-          </TouchableOpacity>
+    <SafeAreaView style={styles.wrapper}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => handleClick()}>
+          <Image source={frame} style={styles.backImg} />
+        </TouchableOpacity>
 
-          <Text style={{fontWeight: '700'}}>Todos</Text>
-          <View
-            style={{
-              width: 25,
-              height: 25,
-            }}></View>
-        </View>
-        {/* 영역 */}
-        {/* <FlatListExample /> */}
-        <View style={styles.buttonWrapper}>
-          <TouchableOpacity
-            onPress={() => handleBtn('a')}
-            style={styles.centerBtn}>
-            <Text style={styles.btnText}>섹션리스트</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => handleBtn('b')}
-            style={styles.centerBtn}>
-            <Text style={styles.btnText}>플랫리스트</Text>
-          </TouchableOpacity>
-        </View>
+        <Text style={styles.headerText}>Todos</Text>
+        <View style={styles.emptyView} />
+      </View>
+      <View style={styles.buttonWrapper}>
+        <TouchableOpacity
+          onPress={() => handleBtn('a')}
+          style={styles.centerBtn}>
+          <Text style={styles.btnText}>섹션리스트</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => handleBtn('b')}
+          style={styles.centerBtn}>
+          <Text style={styles.btnText}>플랫리스트</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -93,11 +82,8 @@ const TodoListGroupScreen = () => {
 export default TodoListGroupScreen;
 
 const styles = StyleSheet.create({
-  wrapper: {
-    flex: 1,
-    position: 'relative',
-    paddingHorizontal: 10,
-  },
+  wrapper: {flex: 1, position: 'relative', paddingHorizontal: 10},
+
   header: {
     // height: '10%',
     paddingVertical: 10,
@@ -107,7 +93,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     position: 'relative',
   },
+  headerText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
   backImg: {
+    width: 25,
+    height: 25,
+    resizeMode: 'center',
+  },
+  emptyView: {
     width: 25,
     height: 25,
   },

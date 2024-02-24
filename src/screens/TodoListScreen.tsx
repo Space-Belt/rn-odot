@@ -102,44 +102,16 @@ const TodoListScreen = ({route}) => {
         {/* 상단 */}
         <MainHeader />
         {/* 입력부분 */}
-        <View
-          style={{
-            marginHorizontal: 20,
-            padding: 10,
-            borderRadius: 10,
-            marginTop: 10,
-            backgroundColor: '#ffffff',
-            shadowColor: '#000',
-            shadowOffset: {width: 0, height: 1.95},
-            shadowOpacity: 0.25,
-            shadowRadius: 1.75,
-            elevation: 5, // 안드로이드용
-          }}>
-          <Text>progress</Text>
-          <View
-            style={{
-              height: 10,
-              borderRadius: 10,
-              marginVertical: 10,
-
-              flexDirection: 'row',
-              position: 'relative',
-              backgroundColor: '#D9D9D9',
-            }}>
-            <View
-              style={{
-                position: 'relative',
-                width: '100%',
-                height: 10,
-              }}>
+        <View style={styles.textInputArea}>
+          <Text style={{fontWeight: '600'}}>progress</Text>
+          <View style={styles.percentageArea}>
+            <View style={styles.emptyPercentage}>
               <View style={percentStyle} />
             </View>
           </View>
           <View>
             <Text
-              style={{
-                color: '#C4C4C4',
-              }}>{`${doneCount} / ${totalCount}`}</Text>
+              style={styles.countText}>{`${doneCount} / ${totalCount}`}</Text>
           </View>
         </View>
 
@@ -153,14 +125,7 @@ const TodoListScreen = ({route}) => {
         </ScrollView>
         <TouchableHighlight
           onPress={handlePlusClick}
-          style={{
-            position: 'absolute',
-            borderRadius: 50,
-            width: 40,
-            height: 40,
-            right: 10,
-            bottom: 10,
-          }}
+          style={styles.plusWrapper}
           underlayColor="transparent">
           <Image
             style={styles.plusBtn}
@@ -182,25 +147,42 @@ const styles = StyleSheet.create({
   },
 
   textInputArea: {
-    // flex: 1,
+    padding: 15,
+    borderRadius: 12,
+    backgroundColor: '#ffffff',
+    shadowColor: '#00000026',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 2,
+    shadowRadius: 0,
+    gap: 15,
+    marginHorizontal: 20,
+  },
+  percentageArea: {
+    height: 10,
+    borderRadius: 10,
+    marginVertical: 10,
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 30,
-    paddingHorizontal: 25,
+    position: 'relative',
+    backgroundColor: '#D9D9D9',
+  },
+  emptyPercentage: {
+    position: 'relative',
+    width: '100%',
+  },
+  countText: {
+    color: '#C4C4C4',
   },
   inputBox: {flex: 1},
-  todoInput: {
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    // 아래 다있어야함
-    backgroundColor: '#ffffff',
+  plusWrapper: {
+    position: 'absolute',
     borderRadius: 50,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1.95},
-    shadowOpacity: 0.25,
-    shadowRadius: 1.75,
-    elevation: 5, // 안드로이드용
+    width: 40,
+    height: 40,
+    right: 20,
+    bottom: 10,
   },
   plusBtn: {
     width: 40,

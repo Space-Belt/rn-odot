@@ -73,6 +73,7 @@ const SectionListExample = () => {
   return (
     <SectionList
       sections={sections}
+      keyExtractor={keyExtractor}
       contentContainerStyle={{gap: 10}}
       renderItem={renderItem}
       renderSectionHeader={renderSectionHeader}
