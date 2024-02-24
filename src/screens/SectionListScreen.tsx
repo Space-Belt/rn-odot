@@ -1,6 +1,6 @@
 import {Image, SafeAreaView, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
-import SectionListExample from '../components/SectionListExample';
+import SectionListExample from '../components/TodoSectionList/SectionListExample';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {useNavigation} from '@react-navigation/native';
 

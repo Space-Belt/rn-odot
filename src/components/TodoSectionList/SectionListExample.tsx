@@ -1,6 +1,6 @@
 import {SectionList, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
-import {ItemType, SectionType} from '../screens/TodoListGroupScreen';
+import {ItemType, SectionType} from '../../screens/TodoListGroupScreen';
 
 const sectionItem: ItemType[] = [
   {id: '1', name: 'a1'},
@@ -29,25 +29,6 @@ const sectionItem: ItemType[] = [
   {id: '24', name: 'e4'},
   {id: '25', name: 'e5'},
 ];
-
-/**
- *
- * {
- * 2024.02: {
- *  01: [
- *      {
- *        todo: "할일",
- *        done: true,
- *      },
- *      {
- *        todo: "할일",
- *        done: false,
- *      }
- *  ];
- * }
- *
- * }
- */
 
 const SectionListExample = () => {
   const renderItem = ({item}: {item: ItemType}) => {

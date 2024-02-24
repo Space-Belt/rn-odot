@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native';
 import React from 'react';
-import FlatListExample from '../components/FlatListExample';
+import FlatListExample from '../components/TodoFlatList/FlatListExample';
 import {useNavigation} from '@react-navigation/native';
 
 const FlatListScreen = () => {

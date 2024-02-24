@@ -1,6 +1,6 @@
 import {FlatList, StyleSheet, Text, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
-import {Item, ItemType} from '../screens/TodoListGroupScreen';
+import {Item} from '../../screens/TodoListGroupScreen';
 
 const FlatListExample = () => {
   const [itemList, setItemList] = useState<Item[]>([]);
