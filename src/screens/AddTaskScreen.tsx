@@ -12,28 +12,85 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import frame from '../assets/images/Frame.png';
 import arrow from '../assets/images/arrow.png';
-import {Todo} from './TodoListScreen';
 
+import moment from 'moment';
+import {TodoItem, TodoList} from '../types/todos';
+import AddTaskHeader from '../components/Headers/AddTaskHeader';
+
+/**
+ {
+  2024: {
+   01: {
+     01: [
+          {
+           todo: "할일",
+           done: true,
+         },
+         {
+           todo: "할일",
+           done: false,
+         }
+       ];
+     },
+   02: {
+     01: [
+          {
+           todo: "할일",
+           done: true,
+         },
+         {
+           todo: "할일",
+           done: false,
+         }
+       ];
+     },
+  }
+ }
+ */
 const AddTaskScreen = () => {
   const navigation = useNavigation();
 
-  const [todo, setTodo] = useState<string>('');
-  const [odotList, setOdotList] = React.useState<Todo[]>([]);
+  const today = moment().format('YYYY/MM/DD');
+  const year = today.slice(0, 5);
+  const month = today.slice(5, 7);
+  const day = today.slice(8, 10);
 
-  const handleClick = () => {
-    navigation.goBack();
-  };
+  const [dataExist, setDataExist] = useState<boolean>(false);
+
+  const [todoGroup, setTodoGroup] = useState<any>();
+
+  const [todo, setTodo] = useState<string>('');
+  const [todoList, setTodoList] = React.useState<TodoItem[]>([]);
 
   const getData = async () => {
     try {
       const value = await AsyncStorage.getItem('to-do');
+
       if (value !== null) {
-        // value previously stored
+        //   // value previously stored
         let temp = JSON.parse(value);
-        console.log('실행됨');
-        console.log(value);
-        setOdotList(temp);
-        // setTodoGroups(value);
+        //   console.log('실행됨');
+        //   console.log(value);
+        //   setTodoList(temp);
+
+        if (temp[year] !== undefined) {
+          if (temp[year][month] !== undefined) {
+            if (temp[year][month][day] !== undefined) {
+            } else {
+            }
+          } else {
+          }
+        } else {
+        }
+
+        if (
+          temp &&
+          temp[month] !== undefined &&
+          temp[month][day].todos !== undefined &&
+          temp[month][day].todos !== null
+        ) {
+          setTodoList(temp[month][day].todos);
+        }
       }
     } catch (e) {
       // error reading value
@@ -41,15 +98,20 @@ const AddTaskScreen = () => {
   };
 
   const addTodoList = async () => {
-    let clonedData = [...odotList];
-    clonedData.push({
-      name: todo,
-      check: false,
-    });
-    let tempData = JSON.stringify(clonedData);
-    await AsyncStorage.setItem('to-do', tempData);
+    if (todo.length > 0) {
+      // let clonedData = [...todoList];
+      // clonedData.push({
+      //   name: todo,
+      //   check: false,
+      // });
+      // let tempData = JSON.stringify(clonedData);
+      // await AsyncStorage.setItem(, tempData);
+      if (todoList.length > 0) {
+        let clonedData = [...todoList];
+      }
 
-    navigation.goBack();
+      navigation.goBack();
+    }
   };
 
   const handleChangeValue = (text: string) => {
@@ -63,31 +125,15 @@ const AddTaskScreen = () => {
   return (
     <SafeAreaView style={{flex: 1}}>
       <View style={styles.wrapper}>
-        <View style={styles.header}>
-          <View
-            style={{
-              width: 25,
-              height: 25,
-            }}>
-            <TouchableOpacity
-              style={{borderRadius: 50, width: 25, height: 25}}
-              // underlayColor="transparent"
-              onPress={() => handleClick()}>
-              <Image source={frame} style={styles.backImg} />
-            </TouchableOpacity>
-          </View>
-          <Text style={{fontWeight: '700'}}>AddTask</Text>
-          <View style={{width: 25, height: 25}}></View>
-        </View>
+        <AddTaskHeader mb={20} title={'New Task'} />
         {/* 영역 */}
-        <View style={styles.textInputArea}>
-          <TextInput
-            value={todo}
-            onChangeText={(text: string) => handleChangeValue(text)}
-            placeholder="tell me what you gonna do today!"
-            style={styles.todoInput}
-          />
-        </View>
+        <TextInput
+          value={todo}
+          onChangeText={(text: string) => handleChangeValue(text)}
+          placeholder="tell me what you gonna do today!"
+          style={styles.todoInput}
+        />
+
         <View
           style={{
             flex: 1,
@@ -103,22 +149,8 @@ const AddTaskScreen = () => {
           />
         </View>
         <TouchableOpacity onPress={addTodoList}>
-          <View
-            style={{
-              height: 40,
-              backgroundColor: 'green',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: 15,
-            }}>
-            <Text
-              style={{
-                fontWeight: '700',
-                fontSize: 20,
-                color: '#efefef',
-              }}>
-              Add Task
-            </Text>
+          <View style={styles.buttonColor}>
+            <Text style={styles.buttonText}>Add Task</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -132,23 +164,8 @@ const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
     position: 'relative',
-    paddingHorizontal: 10,
+    paddingHorizontal: 20,
     paddingVertical: 10,
-  },
-  header: {
-    height: '10%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    position: 'relative',
-  },
-  backImg: {
-    width: 25,
-    height: 25,
-  },
-  contentArea: {
-    flex: 1,
-    height: '80%',
   },
   textInputArea: {
     width: '100%',
@@ -156,20 +173,34 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 5,
-    paddingHorizontal: 20,
   },
   inputBox: {width: '100%'},
   todoInput: {
-    paddingHorizontal: 10,
-    paddingVertical: 10,
     width: '100%',
-    // 아래 다있어야함
-    backgroundColor: '#ffffff',
     borderRadius: 50,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1.95},
-    shadowOpacity: 0.25,
-    shadowRadius: 1.75,
+    height: 40,
+    backgroundColor: '#ffffff',
+    shadowColor: '#0000000D',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 2,
+    shadowRadius: 0,
+    paddingHorizontal: 17,
+    fontWeight: '600',
     elevation: 5, // 안드로이드용
+  },
+  buttonColor: {
+    height: 45,
+    backgroundColor: '#FF7461',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 12,
+  },
+  buttonText: {
+    fontWeight: '600',
+    fontSize: 14,
+    color: '#efefef',
   },
 });
