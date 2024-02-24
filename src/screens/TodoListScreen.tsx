@@ -17,13 +17,18 @@ import {useIsFocused, useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {TodoItem} from '../types/todos';
 import MainHeader from '../components/Headers/MainHeader';
+import {
+  getStorageData,
+  removeStorageData,
+  saveStorageData,
+} from '../lib/storage-helper';
 
 const TodoListScreen = ({route}) => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
 
   // 이름
-  const [myName, setMyName] = React.useState<string>('SpaceBelt');
+  const [myName, setMyName] = React.useState<string>('');
 
   // 할일
   const [todo, setTodo] = React.useState<string>('');
@@ -96,11 +101,25 @@ const TodoListScreen = ({route}) => {
 
   const percentStyle = [styles.percentage, {width: `${percentage}%`}];
 
+  useEffect(() => {
+    // const setUsername = async () => {
+    //   await saveStorageData('name', '우혁주');
+    //   let name = await getStorageData('name');
+    //   setMyName(name);
+    // };
+
+    removeStorageData('name');
+
+    // setUsername();
+  }, []);
+
   return (
     <View style={styles.wrapper}>
       <SafeAreaView style={{flex: 1}}>
-        {/* 상단 */}
+        {/* 앱에서는 네비게이션이함 nav */}
         <MainHeader />
+        <Text>My Name Is {myName}</Text>
+
         {/* 입력부분 */}
         <View style={styles.textInputArea}>
           <Text style={{fontWeight: '600'}}>progress</Text>
