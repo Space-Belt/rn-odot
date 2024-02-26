@@ -38,7 +38,11 @@ const TodoListScreen = () => {
   const [fullData, setFullData] = React.useState<WholeTodoList>({});
 
   const handlePlusClick = () => {
-    navigation.navigate('AddTaskScreen');
+    navigation.navigate('AddTaskScreen', {
+      selectedYear: selectedYear,
+      selectedMonth: selectedMonth,
+      selectedDate: selectedDate,
+    });
   };
 
   const handleCheckTodoList = (i: number) => {
