@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import frame from '../assets/images/Frame.png';
 import FlatListExample from '../components/TodoFlatList/FlatListExample';
 import moment from 'moment';
@@ -43,9 +43,12 @@ export interface TempGroupType {
 
 const TodoListGroupScreen = () => {
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
 
   const today = moment().format('YYYY/MM/DD');
   const [year, month, date] = today.split('/');
+
+  const [sections, setSections] = useState<TempGroupType[]>([]);
 
   const handleClick = () => {
     navigation.goBack();
@@ -59,31 +62,6 @@ const TodoListGroupScreen = () => {
     });
   };
   const [todoData, setTodoData] = useState<TempType[]>([]);
-
-  const sections: TempGroupType[] = React.useMemo(() => {
-    const nameObject: Record<string, TempType[]> = {};
-    // if(todoData.length)
-    todoData.forEach(item => {
-      const firstLetter = item.fullDate.slice(0, 7);
-
-      if (!firstLetter) return;
-
-      if (!nameObject[firstLetter]) {
-        nameObject[firstLetter] = [item];
-      } else {
-        nameObject[firstLetter]!.push(item);
-      }
-    });
-    console.log('dfdf');
-    console.log(nameObject);
-
-    return Object.entries(nameObject).map(([title, data]) => ({
-      title,
-      data,
-    }));
-  }, []);
-
-  // const handleSections: S;
 
   const renderSectionHeader = ({section}: {section: any}) => {
     return (
@@ -106,6 +84,26 @@ const TodoListGroupScreen = () => {
     );
   };
 
+  const createSections = (data: TempType[]): TempGroupType[] => {
+    const nameObject: Record<string, TempType[]> = {};
+    data.forEach(item => {
+      const firstLetter = item.fullDate.slice(0, 7);
+
+      if (!firstLetter) return;
+
+      if (!nameObject[firstLetter]) {
+        nameObject[firstLetter] = [item];
+      } else {
+        nameObject[firstLetter]!.push(item);
+      }
+    });
+
+    return Object.entries(nameObject).map(([title, data]) => ({
+      title,
+      data,
+    }));
+  };
+
   useEffect(() => {
     const getData = async () => {
       let results = await getStorageData('todos');
@@ -114,7 +112,9 @@ const TodoListGroupScreen = () => {
       let processedData = [];
       if (results !== null) {
         for (const [tempYear, tempMonths] of Object.entries(results)) {
-          for (const [tempMonth, tempDays] of Object.entries(tempMonths)) {
+          for (const [tempMonth, tempDays] of Object.entries(
+            tempMonths as Object,
+          )) {
             for (const [todo, todos] of Object.entries(tempDays)) {
               let dateInfo = `${tempYear}/${tempMonth}/${todo}`;
               let doneCount = 0;
@@ -133,10 +133,12 @@ const TodoListGroupScreen = () => {
         }
       }
       setTodoData(processedData);
-      console.log(processedData);
+      setSections(createSections(processedData));
     };
-    getData();
-  }, []);
+    if (isFocused) {
+      getData();
+    }
+  }, [isFocused]);
 
   return (
     <SafeAreaView style={styles.wrapper}>
@@ -154,7 +156,6 @@ const TodoListGroupScreen = () => {
         </TouchableOpacity>
       </View>
       <View style={styles.buttonWrapper}>
-        {/* <FlatListExample /> */}
         {todoData.length > 0 && (
           <SectionList
             sections={sections}
@@ -162,7 +163,7 @@ const TodoListGroupScreen = () => {
             contentContainerStyle={{gap: 10}}
             renderItem={renderItem}
             renderSectionHeader={renderSectionHeader}
-            style={styles.wrapper}
+            // style={styles.wrapper}
             stickySectionHeadersEnabled={true}
           />
         )}
