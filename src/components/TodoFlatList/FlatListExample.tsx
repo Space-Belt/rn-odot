@@ -21,7 +21,6 @@ const FlatListExample = () => {
       title: `item-${index}`,
       date: '2023.12.15',
     }));
-
     setItemList(clonedArr);
   }, []);
   return (

@@ -1,27 +1,20 @@
+import React, {useEffect, useState} from 'react';
 import {
-  FlatList,
   Image,
-  ScrollView,
   SectionList,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {TouchableHighlight} from 'react-native-gesture-handler';
+
 import {useNavigation} from '@react-navigation/native';
 import frame from '../assets/images/Frame.png';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import TodoListScreen, {Todo} from './TodoListScreen';
 import FlatListExample from '../components/TodoFlatList/FlatListExample';
-import SectionListExample from '../components/TodoSectionList/SectionListExample';
+import moment from 'moment';
+import {getStorageData} from '../lib/storage-helper';
 
-// - 굳이 필요 없을 것 같아서 바텀탭은 안넣었음
-// - 맨 오른쪽에 있는 TODOS 스크린은 빈 화면으로 구현하면 됨
-// - 플러스 버튼 눌렀을 때는 우측에 있는 NEW TASKS 스크린으로 navigate 되어야 함(이 버튼은 항상 같은 위치에 플로팅 되는 버튼임)
-// - todo 체크되면 -> progress bar가 퍼센티지만큼 채워져야 함(반대는 그만큼 퍼센티지 줄어듦)
 export interface Item {
   id: number;
   title: string;
@@ -38,20 +31,112 @@ export interface SectionType {
   data: ItemType[];
 }
 
+export interface TempType {
+  count: string;
+  fullDate: string;
+}
+
+export interface TempGroupType {
+  title: string;
+  data: TempType[];
+}
+
 const TodoListGroupScreen = () => {
   const navigation = useNavigation();
+
+  const today = moment().format('YYYY/MM/DD');
+  const [year, month, date] = today.split('/');
 
   const handleClick = () => {
     navigation.goBack();
   };
 
-  const handleBtn = (type: 'a' | 'b') => {
-    if (type === 'a') {
-      navigation.navigate('FlatListScreen');
-    } else {
-      navigation.navigate('SectionListScreen');
-    }
+  const handleAddTask = () => {
+    navigation.navigate('AddTaskScreen', {
+      selectedYear: year,
+      selectedMonth: month,
+      selectedDate: date,
+    });
   };
+  const [todoData, setTodoData] = useState<TempType[]>([]);
+
+  const sections: TempGroupType[] = React.useMemo(() => {
+    const nameObject: Record<string, TempType[]> = {};
+    // if(todoData.length)
+    todoData.forEach(item => {
+      const firstLetter = item.fullDate.slice(0, 7);
+
+      if (!firstLetter) return;
+
+      if (!nameObject[firstLetter]) {
+        nameObject[firstLetter] = [item];
+      } else {
+        nameObject[firstLetter]!.push(item);
+      }
+    });
+    console.log('dfdf');
+    console.log(nameObject);
+
+    return Object.entries(nameObject).map(([title, data]) => ({
+      title,
+      data,
+    }));
+  }, []);
+
+  // const handleSections: S;
+
+  const renderSectionHeader = ({section}: {section: any}) => {
+    return (
+      <View>
+        <Text>{section.title}</Text>
+      </View>
+    );
+  };
+
+  const keyExtractor = (item: TempType) =>
+    `section-list-item-=${item.fullDate}`;
+  const renderItem = ({item}: {item: TempType}) => {
+    return (
+      <View style={styles.listWrapper}>
+        <Text style={styles.dateText}>
+          {item.fullDate.slice(8, 10)}일 Todos
+        </Text>
+        <Text style={styles.countText}>{item.count}</Text>
+      </View>
+    );
+  };
+
+  useEffect(() => {
+    const getData = async () => {
+      let results = await getStorageData('todos');
+
+      console.log(results);
+      let processedData = [];
+      if (results !== null) {
+        for (const [tempYear, tempMonths] of Object.entries(results)) {
+          for (const [tempMonth, tempDays] of Object.entries(tempMonths)) {
+            for (const [todo, todos] of Object.entries(tempDays)) {
+              let dateInfo = `${tempYear}/${tempMonth}/${todo}`;
+              let doneCount = 0;
+
+              todos.map((todoEl, index) => {
+                if (todoEl.done === true) {
+                  doneCount += 1;
+                }
+              });
+              processedData.push({
+                fullDate: dateInfo,
+                count: `${doneCount}/${todos.length}`,
+              });
+            }
+          }
+        }
+      }
+      setTodoData(processedData);
+      console.log(processedData);
+    };
+    getData();
+  }, []);
 
   return (
     <SafeAreaView style={styles.wrapper}>
@@ -61,19 +146,26 @@ const TodoListGroupScreen = () => {
         </TouchableOpacity>
 
         <Text style={styles.headerText}>Todos</Text>
-        <View style={styles.emptyView} />
+        <TouchableOpacity onPress={() => handleAddTask()}>
+          <Image
+            source={require('../assets/images/plusButton.png')}
+            style={styles.addBtn}
+          />
+        </TouchableOpacity>
       </View>
       <View style={styles.buttonWrapper}>
-        <TouchableOpacity
-          onPress={() => handleBtn('a')}
-          style={styles.centerBtn}>
-          <Text style={styles.btnText}>섹션리스트</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => handleBtn('b')}
-          style={styles.centerBtn}>
-          <Text style={styles.btnText}>플랫리스트</Text>
-        </TouchableOpacity>
+        {/* <FlatListExample /> */}
+        {todoData.length > 0 && (
+          <SectionList
+            sections={sections}
+            keyExtractor={keyExtractor}
+            contentContainerStyle={{gap: 10}}
+            renderItem={renderItem}
+            renderSectionHeader={renderSectionHeader}
+            style={styles.wrapper}
+            stickySectionHeadersEnabled={true}
+          />
+        )}
       </View>
     </SafeAreaView>
   );
@@ -85,7 +177,6 @@ const styles = StyleSheet.create({
   wrapper: {flex: 1, position: 'relative', paddingHorizontal: 10},
 
   header: {
-    // height: '10%',
     paddingVertical: 10,
     marginBottom: 10,
     flexDirection: 'row',
@@ -113,6 +204,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  addBtn: {
+    width: 25,
+    height: 25,
+    resizeMode: 'center',
+  },
   centerBtn: {
     padding: 10,
     backgroundColor: 'skyblue',
@@ -122,5 +218,25 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     fontSize: 18,
     color: 'white',
+  },
+  listWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    backgroundColor: '#ffffff',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 0},
+    shadowOpacity: 0.2,
+    shadowRadius: 1,
+    elevation: 5, // 안드로이드용
+  },
+  dateText: {
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  countText: {
+    color: '#C4C4C4',
   },
 });
