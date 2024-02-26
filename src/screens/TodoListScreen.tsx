@@ -13,19 +13,18 @@ import React, {useEffect} from 'react';
 import space from '../assets/images/space.png';
 import hamburger from '../assets/images/hamburger.png';
 
-import {useIsFocused, useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {TodoItem} from '../types/todos';
+import {TodoItem, WholeTodoList} from '../types/todos';
 import MainHeader from '../components/Headers/MainHeader';
-import {
-  getStorageData,
-  removeStorageData,
-  saveStorageData,
-} from '../lib/storage-helper';
+import {getStorageData} from '../lib/storage-helper';
 
-const TodoListScreen = ({route}) => {
+const TodoListScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute();
   const isFocused = useIsFocused();
+
+  const {selectedYear, selectedMonth, selectedDate} = route.params;
 
   // 이름
   const [myName, setMyName] = React.useState<string>('');
@@ -36,30 +35,20 @@ const TodoListScreen = ({route}) => {
   // 할일 리스트
   const [odotList, setOdotList] = React.useState<TodoItem[]>([]);
 
+  const [fullData, setFullData] = React.useState<WholeTodoList>({});
+
   const handlePlusClick = () => {
     navigation.navigate('AddTaskScreen');
   };
 
-  const getData = async () => {
-    try {
-      const value = await AsyncStorage.getItem('to-do');
-      if (value !== null) {
-        // value previously stored
-        let temp = JSON.parse(value);
-        console.log('실행됨');
-        console.log(value);
-        setOdotList(temp);
-        // setTodoGroups(value);
-      }
-    } catch (e) {
-      // error reading value
-    }
-  };
-
   const handleCheckTodoList = (i: number) => {
+    let clonedFullData: WholeTodoList = fullData;
     let clonedOdotList: TodoItem[] = [...odotList];
-    clonedOdotList[i].check = !clonedOdotList[i].check;
+    clonedOdotList[i].done = !clonedOdotList[i].done;
     setOdotList(clonedOdotList);
+    clonedFullData[selectedYear][selectedMonth][selectedDate] = clonedOdotList;
+
+    AsyncStorage.setItem('todos', JSON.stringify(clonedFullData));
   };
 
   const renderList = (todo: TodoItem, i: number) => {
@@ -70,7 +59,7 @@ const TodoListScreen = ({route}) => {
             styles.todo,
             odotList.length - 1 === i ? {marginBottom: 10} : {},
           ]}>
-          {todo.check !== undefined && todo.check !== false ? (
+          {todo.done !== undefined && todo.done !== false ? (
             <Image
               style={styles.checkImg}
               source={require('../assets/images/checked.png')}
@@ -82,7 +71,7 @@ const TodoListScreen = ({route}) => {
             />
           )}
           <View style={{marginLeft: 5}}>
-            <Text>{todo.name}</Text>
+            <Text>{todo.todo}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -90,36 +79,38 @@ const TodoListScreen = ({route}) => {
   };
 
   useEffect(() => {
+    const getDatas = async () => {
+      let results = await getStorageData('todos');
+      let todoList: TodoItem[] = [];
+      if (results !== null) {
+        if (results[selectedYear][selectedMonth][selectedDate]) {
+          console.log('dfdfdfdf');
+          results[selectedYear][selectedMonth][selectedDate].map(el => {
+            todoList.push(el);
+          });
+        }
+      }
+      setFullData(results);
+      setOdotList(todoList);
+    };
     if (isFocused) {
-      getData();
+      getDatas();
     }
   }, [isFocused]);
 
   const totalCount = odotList.length;
-  const doneCount = odotList.filter(list => list.check).length;
+  const doneCount = odotList.filter(list => list.done).length;
   const percentage = (doneCount / totalCount) * 100;
 
   const percentStyle = [styles.percentage, {width: `${percentage}%`}];
 
-  useEffect(() => {
-    // const setUsername = async () => {
-    //   await saveStorageData('name', '우혁주');
-    //   let name = await getStorageData('name');
-    //   setMyName(name);
-    // };
-
-    removeStorageData('name');
-
-    // setUsername();
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <View style={styles.wrapper}>
       <SafeAreaView style={{flex: 1}}>
         {/* 앱에서는 네비게이션이함 nav */}
         <MainHeader />
-        <Text>My Name Is {myName}</Text>
-
         {/* 입력부분 */}
         <View style={styles.textInputArea}>
           <Text style={{fontWeight: '600'}}>progress</Text>

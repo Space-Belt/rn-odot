@@ -71,16 +71,27 @@ const TodoListGroupScreen = () => {
     );
   };
 
+  const handleListClicked = (date: string) => {
+    let [a, b, c] = date.split('/');
+    navigation.navigate('TodoListScreen', {
+      selectedYear: a,
+      selectedMonth: b,
+      selectedDate: c,
+    });
+  };
+
   const keyExtractor = (item: TempType) =>
     `section-list-item-=${item.fullDate}`;
   const renderItem = ({item}: {item: TempType}) => {
     return (
-      <View style={styles.listWrapper}>
-        <Text style={styles.dateText}>
-          {item.fullDate.slice(8, 10)}일 Todos
-        </Text>
-        <Text style={styles.countText}>{item.count}</Text>
-      </View>
+      <TouchableOpacity onPress={() => handleListClicked(item.fullDate)}>
+        <View style={styles.listWrapper}>
+          <Text style={styles.dateText}>
+            {item.fullDate.slice(8, 10)}일 Todos
+          </Text>
+          <Text style={styles.countText}>{item.count}</Text>
+        </View>
+      </TouchableOpacity>
     );
   };
 
