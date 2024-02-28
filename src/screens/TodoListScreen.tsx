@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,24 +16,22 @@ import {TodoItem, WholeTodoList} from '../types/todos';
 import MainHeader from '../components/Headers/MainHeader';
 import {getStorageData} from '../lib/storage-helper';
 
+const defaultParams = {
+  selectedYear: '',
+  selectedMonth: '',
+  selectedDate: '',
+};
+
 const TodoListScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
+  const params = route.params;
   const isFocused = useIsFocused();
-
-  const {selectedYear, selectedMonth, selectedDate} = route.params;
+  const {selectedYear, selectedMonth, selectedDate} = params ?? defaultParams;
 
   const [odotList, setOdotList] = React.useState<TodoItem[]>([]);
 
   const [fullData, setFullData] = React.useState<WholeTodoList>({});
-
-  const handlePlusClick = () => {
-    navigation.navigate('AddTaskScreen', {
-      selectedYear: selectedYear,
-      selectedMonth: selectedMonth,
-      selectedDate: selectedDate,
-    });
-  };
 
   const handleCheckTodoList = (i: number) => {
     let clonedFullData: WholeTodoList = fullData;
@@ -41,13 +39,22 @@ const TodoListScreen = () => {
     clonedOdotList[i].done = !clonedOdotList[i].done;
     setOdotList(clonedOdotList);
     clonedFullData[selectedYear][selectedMonth][selectedDate] = clonedOdotList;
-
     AsyncStorage.setItem('todos', JSON.stringify(clonedFullData));
+  };
+
+  const handlePlusClick = () => {
+    navigation.navigate('AddTaskScreen', {
+      selectedYear,
+      selectedMonth,
+      selectedDate,
+    });
   };
 
   const renderList = (todo: TodoItem, i: number) => {
     return (
-      <TouchableOpacity onPress={() => handleCheckTodoList(i)}>
+      <TouchableOpacity
+        onPress={() => handleCheckTodoList(i)}
+        key={`todos-${i}`}>
         <View
           style={[
             styles.todo,
@@ -76,22 +83,28 @@ const TodoListScreen = () => {
     const getDatas = async () => {
       let results = await getStorageData('todos');
       let todoList: TodoItem[] = [];
-      if (results !== null) {
-        if (results[selectedYear][selectedMonth][selectedDate]) {
-          console.log('dfdfdfdf');
-          results[selectedYear][selectedMonth][selectedDate].map(el => {
-            todoList.push(el);
-          });
-        }
+
+      if (results === null) {
+        return;
       }
+
+      if (results[selectedYear][selectedMonth][selectedDate]) {
+        results[selectedYear][selectedMonth][selectedDate].map(
+          (el: TodoItem) => {
+            todoList.push(el);
+          },
+        );
+      }
+
       setFullData(results);
       setOdotList(todoList);
     };
+
     if (isFocused) {
       getDatas();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFocused]);
+  }, [isFocused, route.params]);
 
   const totalCount = odotList.length;
   const doneCount = odotList.filter(list => list.done).length;
@@ -99,14 +112,12 @@ const TodoListScreen = () => {
 
   const percentStyle = [styles.percentage, {width: `${percentage}%`}];
 
-  useEffect(() => {}, []);
-
   return (
     <View style={styles.wrapper}>
       <SafeAreaView style={{flex: 1}}>
         {/* 앱에서는 네비게이션이함 nav */}
         <MainHeader />
-        {/* 입력부분 */}
+
         <View style={styles.textInputArea}>
           <Text style={styles.progressTextStyle}>progress</Text>
           <View style={styles.percentageArea}>

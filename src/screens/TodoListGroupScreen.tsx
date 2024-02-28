@@ -71,11 +71,11 @@ const TodoListGroupScreen = () => {
   };
 
   const handleListClicked = (date: string) => {
-    let [a, b, c] = date.split('/');
+    let [clickedYear, clickedMonth, clickedDate] = date.split('/');
     navigation.navigate('TodoListScreen', {
-      selectedYear: a,
-      selectedMonth: b,
-      selectedDate: c,
+      selectedYear: clickedYear,
+      selectedMonth: clickedMonth,
+      selectedDate: clickedDate,
     });
   };
 
@@ -129,7 +129,7 @@ const TodoListGroupScreen = () => {
               let dateInfo = `${tempYear}/${tempMonth}/${todo}`;
               let doneCount = 0;
 
-              todos.map((todoEl, index) => {
+              todos.map(todoEl => {
                 if (todoEl.done === true) {
                   doneCount += 1;
                 }
