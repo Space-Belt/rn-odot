@@ -170,7 +170,7 @@ const TodoListGroupScreen = () => {
           <SectionList
             sections={sections}
             keyExtractor={keyExtractor}
-            contentContainerStyle={{gap: 10}}
+            contentContainerStyle={styles.sectionStyle}
             renderItem={renderItem}
             renderSectionHeader={renderSectionHeader}
             stickySectionHeadersEnabled={true}
@@ -245,6 +245,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 16,
   },
+  sectionStyle: {gap: 10},
   countText: {
     color: '#C4C4C4',
   },

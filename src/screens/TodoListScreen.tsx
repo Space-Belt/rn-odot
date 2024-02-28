@@ -64,7 +64,7 @@ const TodoListScreen = () => {
               source={require('../assets/images/unchecked.png')}
             />
           )}
-          <View style={{marginLeft: 5}}>
+          <View style={styles.todoStyle}>
             <Text>{todo.todo}</Text>
           </View>
         </View>
@@ -108,7 +108,7 @@ const TodoListScreen = () => {
         <MainHeader />
         {/* 입력부분 */}
         <View style={styles.textInputArea}>
-          <Text style={{fontWeight: '600'}}>progress</Text>
+          <Text style={styles.progressTextStyle}>progress</Text>
           <View style={styles.percentageArea}>
             <View style={styles.emptyPercentage}>
               <View style={percentStyle} />
@@ -121,7 +121,7 @@ const TodoListScreen = () => {
         </View>
 
         {/* 투두 부분 */}
-        <ScrollView style={{paddingHorizontal: 25}}>
+        <ScrollView style={styles.scrollViewStyle}>
           {odotList.length > 0 ? (
             odotList.map((el: TodoItem, i: number) => renderList(el, i))
           ) : (
@@ -173,6 +173,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     backgroundColor: '#D9D9D9',
   },
+  progressTextStyle: {fontWeight: '600'},
   emptyPercentage: {
     position: 'relative',
     width: '100%',
@@ -207,6 +208,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     marginTop: 15,
   },
+  todoStyle: {marginLeft: 5},
+  scrollViewStyle: {paddingHorizontal: 25},
+
   checkImg: {
     width: 25,
     height: 25,
