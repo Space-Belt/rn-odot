@@ -1,6 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// 비동기
 export const saveStorageData = async (key: string, value: any) => {
   const valueString = JSON.stringify(value);
 

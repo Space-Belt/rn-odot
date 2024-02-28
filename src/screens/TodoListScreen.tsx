@@ -4,14 +4,11 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableHighlight,
   TouchableOpacity,
   View,
 } from 'react-native';
 import React, {useEffect} from 'react';
-import space from '../assets/images/space.png';
-import hamburger from '../assets/images/hamburger.png';
 
 import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -26,13 +23,6 @@ const TodoListScreen = () => {
 
   const {selectedYear, selectedMonth, selectedDate} = route.params;
 
-  // 이름
-  const [myName, setMyName] = React.useState<string>('');
-
-  // 할일
-  const [todo, setTodo] = React.useState<string>('');
-
-  // 할일 리스트
   const [odotList, setOdotList] = React.useState<TodoItem[]>([]);
 
   const [fullData, setFullData] = React.useState<WholeTodoList>({});
@@ -100,6 +90,7 @@ const TodoListScreen = () => {
     if (isFocused) {
       getDatas();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFocused]);
 
   const totalCount = odotList.length;

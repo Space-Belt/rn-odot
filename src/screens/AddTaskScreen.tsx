@@ -18,65 +18,6 @@ import {TodoItem, WholeTodoList} from '../types/todos';
 import AddTaskHeader from '../components/Headers/AddTaskHeader';
 import {getAllKeys, getStorageData} from '../lib/storage-helper';
 
-// const temp = {
-//   2024: {
-//     02: {
-//       24: [{todo: '할일', done: true}],
-//     },
-//   },
-// };
-
-// const data = {
-//   'todos-2024-01': {},
-//   'todos-2024-02': {},
-//   'todos-2024-03': {},
-//   'todos-2024-04': {},
-
-// };
-
-// const today = moment().format('YYYY/MM/DD');
-
-// const [year, month, date] = today.split('/');
-// temp[year][month][date];
-/**
- {
-  2024: {
-   01: {
-     01: [
-          {
-           todo: "할일",
-           done: true,
-         },
-         {
-           todo: "할일",
-           done: false,
-         }
-       ];
-     },
-   02: {
-     01: [
-          {
-           todo: "할일",
-           done: true,
-         },
-         {
-           todo: "할일",
-           done: false,
-         }
-       ];
-     },
-  }
- }
- */
-
-// type Props = {
-//   // selectedData?: {
-//   selectedYear: string;
-//   selectedMonth: string;
-//   selectedDate: string;
-//   // };
-// };
-
 const AddTaskScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -212,7 +153,7 @@ const styles = StyleSheet.create({
     shadowRadius: 0,
     paddingHorizontal: 17,
     fontWeight: '600',
-    elevation: 5, // 안드로이드용
+    elevation: 5,
   },
   arrowPhoto: {
     flex: 1,

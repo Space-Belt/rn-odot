@@ -11,7 +11,6 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import frame from '../assets/images/Frame.png';
-import FlatListExample from '../components/TodoFlatList/FlatListExample';
 import moment from 'moment';
 import {getStorageData} from '../lib/storage-helper';
 
@@ -174,7 +173,6 @@ const TodoListGroupScreen = () => {
             contentContainerStyle={{gap: 10}}
             renderItem={renderItem}
             renderSectionHeader={renderSectionHeader}
-            // style={styles.wrapper}
             stickySectionHeadersEnabled={true}
           />
         )}
@@ -210,7 +208,6 @@ const styles = StyleSheet.create({
     height: 25,
   },
   buttonWrapper: {
-    // flex: 1,
     gap: 10,
     flexDirection: 'row',
     alignItems: 'center',
@@ -242,7 +239,7 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 0},
     shadowOpacity: 0.2,
     shadowRadius: 1,
-    elevation: 5, // 안드로이드용
+    elevation: 5,
   },
   dateText: {
     fontWeight: '600',

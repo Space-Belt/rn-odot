@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 0},
     shadowOpacity: 0.2,
     shadowRadius: 1,
-    elevation: 5, // 안드로이드용
+    elevation: 5,
   },
 
   title: {
