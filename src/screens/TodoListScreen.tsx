@@ -119,7 +119,11 @@ const TodoListScreen = () => {
       <SafeAreaView style={{flex: 1}}>
         {/* 앱에서는 네비게이션이함 nav */}
         <MainHeader />
-
+        <View>
+          {route.params ?? (
+            <Text>{`${selectedYear}/${selectedMonth}/${selectedDate}`}</Text>
+          )}
+        </View>
         <View style={styles.textInputArea}>
           <Text style={styles.progressTextStyle}>progress</Text>
           <View style={styles.percentageArea}>
