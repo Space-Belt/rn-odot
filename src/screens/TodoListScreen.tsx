@@ -142,7 +142,7 @@ const TodoListScreen = () => {
           {odotList.length > 0 ? (
             odotList.map((el: TodoItem, i: number) => renderList(el, i))
           ) : (
-            <></>
+            <Text>할일을 등록해주세요!</Text>
           )}
         </ScrollView>
         <TouchableHighlight
