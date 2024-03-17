@@ -17,8 +17,12 @@ import moment from 'moment';
 import {TodoItem, WholeTodoList} from '../types/todos';
 import AddTaskHeader from '../components/Headers/AddTaskHeader';
 import {getAllKeys, getStorageData} from '../lib/storage-helper';
+import {useToast} from '../recoil/ToastStore';
+import ToastMessage from '../components/toastMessage/ToastMessage';
 
 const AddTaskScreen = () => {
+  const {toast, showToast} = useToast();
+
   const navigation = useNavigation();
   const route = useRoute();
 
@@ -54,13 +58,14 @@ const AddTaskScreen = () => {
             done: false,
           });
           AsyncStorage.setItem('todos', JSON.stringify(clonedData));
-          navigation.navigate('TodoListGroupScreen');
+          // navigation.navigate('TodoListGroupScreen');
+          showToast('아아', 'dkdk', 'a');
         } else {
           clonedData[selectedYear][selectedMonth][selectedDate] = [
             {todo: todo, done: false},
           ];
           AsyncStorage.setItem('todos', JSON.stringify(clonedData));
-          navigation.navigate('TodoListGroupScreen');
+          // navigation.navigate('TodoListGroupScreen');
         }
       }
     } else {
@@ -98,7 +103,8 @@ const AddTaskScreen = () => {
   }, []);
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={styles.safeWrapper}>
+      {toast.visible === true && <ToastMessage status="FAIL" />}
       <View style={styles.wrapper}>
         <AddTaskHeader mb={20} title={'New Task'} />
         {/* 영역 */}
@@ -125,6 +131,7 @@ const AddTaskScreen = () => {
 export default AddTaskScreen;
 
 const styles = StyleSheet.create({
+  safeWrapper: {flex: 1},
   wrapper: {
     flex: 1,
     position: 'relative',
