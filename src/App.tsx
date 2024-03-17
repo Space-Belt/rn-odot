@@ -9,12 +9,15 @@ import React from 'react';
 
 import {NavigationContainer} from '@react-navigation/native';
 import MainScreen from './screens/MainScreen';
+import {RecoilRoot} from 'recoil';
 
 function App(): React.JSX.Element {
   return (
-    <NavigationContainer>
-      <MainScreen />
-    </NavigationContainer>
+    <RecoilRoot>
+      <NavigationContainer>
+        <MainScreen />
+      </NavigationContainer>
+    </RecoilRoot>
   );
 }
 
