@@ -7,6 +7,7 @@ import Animated, {
 
 type Props = {
   status: 'SUCCESS' | 'FAIL';
+  isVisible: boolean;
 };
 
 const messageList: {
@@ -17,7 +18,7 @@ const messageList: {
   FAIL: '등록에 실패하셨습니다.',
 };
 
-const ToastMessage = ({status}: Props) => {
+const ToastMessage = ({status, isVisible}: Props) => {
   const position = useSharedValue<number>(200);
   const [isMessageOn, setIsMessageOn] = React.useState<boolean>(false);
 
@@ -32,25 +33,18 @@ const ToastMessage = ({status}: Props) => {
   const moveAnimatedStyle = useAnimatedStyle(() => {
     return {
       top: `${position.value}%`,
-      // transform: [{translateX: (-71 * position.value) / 100}],
     };
   });
 
   React.useEffect(() => {
-    if (status === 'SUCCESS') {
-      setIsMessageOn(prev => !prev);
+    if (isVisible) {
+      setIsMessageOn(true);
+      position.value = 10;
+    } else {
+      setIsMessageOn(false);
+      position.value = -100;
     }
-    handleToastMessageOn();
-
-    // 컴포넌트가 마운트되었을 때 setTimeout을 통해 메시지 설정
-    const timeoutId = setTimeout(() => {
-      setIsMessageOn(prev => !prev);
-      handleToastMessageOn();
-    }, 2500); // 3초 후에 메시지 설정
-
-    // cleanup 함수를 이용하여 컴포넌트가 언마운트될 때 setTimeout 정리
-    return () => clearTimeout(timeoutId);
-  }, [status]);
+  }, [isVisible]);
 
   React.useEffect(() => {}, []);
 
