@@ -58,13 +58,16 @@ const AddTaskScreen = () => {
             done: false,
           });
           AsyncStorage.setItem('todos', JSON.stringify(clonedData));
+          setTodo('');
           // navigation.navigate('TodoListGroupScreen');
+          // show
           showToast('아아', 'dkdk', 'a');
         } else {
           clonedData[selectedYear][selectedMonth][selectedDate] = [
             {todo: todo, done: false},
           ];
           AsyncStorage.setItem('todos', JSON.stringify(clonedData));
+          setTodo('');
           // navigation.navigate('TodoListGroupScreen');
         }
       }
@@ -78,7 +81,9 @@ const AddTaskScreen = () => {
         },
       ];
       AsyncStorage.setItem('todos', JSON.stringify(clonedData));
-      navigation.navigate('TodoListGroupScreen');
+      setTodo('');
+      showToast('아아', 'dkdk', 'a');
+      // navigation.navigate('TodoListGroupScreen');
     }
   };
 
@@ -104,7 +109,9 @@ const AddTaskScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeWrapper}>
-      {toast.visible === true && <ToastMessage status="FAIL" />}
+      {toast.visible === true && (
+        <ToastMessage isVisible={toast.visible} status="FAIL" />
+      )}
       <View style={styles.wrapper}>
         <AddTaskHeader mb={20} title={'New Task'} />
         {/* 영역 */}
