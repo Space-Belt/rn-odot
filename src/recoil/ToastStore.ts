@@ -1,37 +1,46 @@
+import {ViewStyle} from 'react-native';
 import {atom, useRecoilState} from 'recoil';
 
-interface IToastState {
-  visible: boolean;
+interface IToastMessage {
   type: string;
   message: string;
   subMessage: string;
 }
 
-const initialToastState: IToastState = {
-  visible: false,
+const initialToastState: IToastMessage = {
   type: '',
   message: '',
   subMessage: '',
 };
 
-export const toastSlice = atom<IToastState>({
+export const toastState = atom<IToastMessage>({
   key: 'toastState',
   default: initialToastState,
 });
 
+export const toastVisibility = atom({
+  key: 'toastVisibility',
+  default: false,
+});
+
 export const useToast = () => {
-  const [toast, setToast] = useRecoilState(toastSlice);
+  const [toastMessage, setToastMessage] = useRecoilState(toastState);
+  const [isVisible, setIsVisible] = useRecoilState(toastVisibility);
 
   const showToast = (message: string, subMessage: string, type: string) => {
-    setToast({
-      visible: true,
+    setToastMessage({
       message: message,
       subMessage: subMessage,
       type: type,
     });
+    setIsVisible(true);
+
     setTimeout(() => {
-      setToast({visible: false, message: '', subMessage: '', type: ''});
+      'worklet';
+      setToastMessage({message: '', subMessage: '', type: ''});
+      setIsVisible(false);
     }, 3000);
   };
-  return {toast, showToast};
+
+  return {showToast};
 };
