@@ -18,6 +18,7 @@ import {getStorageData} from '../lib/storage-helper';
 import moment from 'moment';
 import {useBottomSheet} from '../recoil/BottomSheetStore';
 import NewTaskBottomsheet from '../components/NewTask/NewTaskBottomsheet';
+import {useToast} from '../recoil/ToastStore';
 
 const defaultParams = {
   selectedYear: '',
@@ -29,7 +30,9 @@ const TodoListScreen = () => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
 
-  const {showBottomSheet, isVisible} = useBottomSheet();
+  const {showBottomSheet} = useBottomSheet();
+
+  const {isVisible} = useToast();
 
   const [thisYear, setThisYear] = useState<string>('');
   const [thisMonth, setThitMonth] = useState<string>('');
@@ -114,7 +117,7 @@ const TodoListScreen = () => {
       }
       getDatas(results.year, results.month, results.day);
     };
-    if (isFocused) {
+    if (isFocused || isVisible === true) {
       getData();
     }
   }, [isFocused, isVisible]);
