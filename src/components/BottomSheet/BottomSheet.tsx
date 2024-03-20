@@ -49,7 +49,7 @@ const BottomSheet = () => {
     if (isVisible.isBottomSheetVisible) {
       setIsOn(true);
       top.value = withTiming(screenHeight - bottomSheetHeight, {
-        duration: 1000,
+        duration: 400,
       });
       // setIsOn(true);
       // bottom.value = withTiming(bottomSheetHeight, {
@@ -60,11 +60,11 @@ const BottomSheet = () => {
       //   duration: 700,
       // });
       top.value = withTiming(screenHeight, {
-        duration: 1000,
+        duration: 400,
       });
       const timeout = setTimeout(() => {
         setIsOn(false);
-      }, 800);
+      }, 400);
       return () => clearTimeout(timeout);
     }
   }, [isVisible.isBottomSheetVisible]);
