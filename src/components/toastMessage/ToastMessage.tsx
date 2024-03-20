@@ -1,62 +1,75 @@
-import {StyleSheet, Text, View} from 'react-native';
-import React from 'react';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-} from 'react-native-reanimated';
+import {LayoutChangeEvent, StyleSheet, Text, View} from 'react-native';
+import React, {useCallback} from 'react';
+import Animated, {FadeIn, FadeOut} from 'react-native-reanimated';
+import {toastContent, toastVisibility} from '../../recoil/ToastStore';
+import {useRecoilValue} from 'recoil';
+import Error from '../../assets/images/error.svg';
+import Success from '../../assets/images/success.svg';
 
-type Props = {
-  status: 'SUCCESS' | 'FAIL';
-  isVisible: boolean;
-};
+const DEFAULT_WIDTH = 350;
 
-const messageList: {
-  SUCCESS: string;
-  FAIL: string;
-} = {
-  SUCCESS: '등록에 성공하셨습니다.',
-  FAIL: '등록에 실패하셨습니다.',
-};
+const ToastMessage = () => {
+  const isToastOn = useRecoilValue(toastVisibility);
+  const toastMessage = useRecoilValue(toastContent);
 
-const ToastMessage = ({status, isVisible}: Props) => {
-  const position = useSharedValue<number>(200);
-  const [isMessageOn, setIsMessageOn] = React.useState<boolean>(false);
-
-  const handleToastMessageOn = () => {
-    if (isMessageOn) {
-      position.value = 10;
-    } else if (!isMessageOn) {
-      position.value = -100;
-    }
+  const shadowStyle = {
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1,
+    elevation: 5,
   };
 
-  const moveAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      top: `${position.value}%`,
-    };
-  });
-
-  React.useEffect(() => {
-    if (isVisible) {
-      setIsMessageOn(true);
-      position.value = 10;
-    } else {
-      setIsMessageOn(false);
-      position.value = -100;
-    }
-  }, [isVisible]);
-
-  React.useEffect(() => {}, []);
-
   return (
-    <Animated.View style={[styles.wrapper, moveAnimatedStyle]}>
-      <Text>toastMessage</Text>
-    </Animated.View>
+    <View style={[styles.wrapper, isToastOn ? shadowStyle : {}]}>
+      {isToastOn && (
+        <Animated.View
+          style={[styles.toastWrapper]}
+          entering={FadeIn}
+          exiting={FadeOut}>
+          <View style={styles.contentWrapper}>
+            {toastMessage.type === 'success' ? <Success /> : <Error />}
+            <Text style={styles.textWrapper} numberOfLines={1}>
+              {toastMessage.message}
+            </Text>
+          </View>
+        </Animated.View>
+      )}
+    </View>
   );
 };
 
 export default ToastMessage;
 
 const styles = StyleSheet.create({
-  wrapper: {},
+  wrapper: {
+    position: 'absolute',
+    top: 20,
+    left: '50%',
+    backgroundColor: '#fefefe',
+    transform: [{translateX: -DEFAULT_WIDTH / 2}],
+    borderRadius: 8,
+  },
+  toastWrapper: {
+    width: DEFAULT_WIDTH,
+    height: 45,
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+  },
+  contentWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  textWrapper: {
+    marginLeft: 8,
+    fontSize: 12,
+    fontWeight: '500',
+  },
 });

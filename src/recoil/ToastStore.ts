@@ -13,8 +13,8 @@ const initialToastState: IToastMessage = {
   subMessage: '',
 };
 
-export const toastState = atom<IToastMessage>({
-  key: 'toastState',
+export const toastContent = atom<IToastMessage>({
+  key: 'toastContent',
   default: initialToastState,
 });
 
@@ -24,7 +24,7 @@ export const toastVisibility = atom({
 });
 
 export const useToast = () => {
-  const [toastMessage, setToastMessage] = useRecoilState(toastState);
+  const [toastMessage, setToastMessage] = useRecoilState(toastContent);
   const [isVisible, setIsVisible] = useRecoilState(toastVisibility);
 
   const showToast = (message: string, subMessage: string, type: string) => {
@@ -36,10 +36,9 @@ export const useToast = () => {
     setIsVisible(true);
 
     setTimeout(() => {
-      'worklet';
       setToastMessage({message: '', subMessage: '', type: ''});
       setIsVisible(false);
-    }, 3000);
+    }, 2300);
   };
 
   return {showToast};
