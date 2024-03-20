@@ -13,7 +13,7 @@ import {useIsFocused, useNavigation} from '@react-navigation/native';
 import frame from '../assets/images/Frame.png';
 import moment from 'moment';
 import {getStorageData} from '../lib/storage-helper';
-import ToastMessage from '../components/toastMessage/ToastMessage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface Item {
   id: number;
@@ -55,11 +55,15 @@ const TodoListGroupScreen = () => {
   };
 
   const handleAddTask = () => {
-    navigation.navigate('AddTaskScreen', {
-      selectedYear: year,
-      selectedMonth: month,
-      selectedDate: date,
-    });
+    AsyncStorage.setItem(
+      'date',
+      JSON.stringify({
+        year: year,
+        month: month,
+        day: date,
+      }),
+    );
+    navigation.navigate('AddTaskScreen');
   };
   const [todoData, setTodoData] = useState<TempType[]>([]);
 
@@ -73,11 +77,15 @@ const TodoListGroupScreen = () => {
 
   const handleListClicked = (date: string) => {
     let [clickedYear, clickedMonth, clickedDate] = date.split('/');
-    navigation.navigate('TodoListScreen', {
-      selectedYear: clickedYear,
-      selectedMonth: clickedMonth,
-      selectedDate: clickedDate,
-    });
+    AsyncStorage.setItem(
+      'date',
+      JSON.stringify({
+        year: clickedYear,
+        month: clickedMonth,
+        day: clickedDate,
+      }),
+    );
+    navigation.navigate('TodoListScreen');
   };
 
   const keyExtractor = (item: TempType) =>
@@ -143,7 +151,7 @@ const TodoListGroupScreen = () => {
           }
         }
       }
-      setTodoData(processedData);
+      setTodoData(processedData.reverse());
       setSections(createSections(processedData));
     };
     if (isFocused) {
@@ -154,7 +162,6 @@ const TodoListGroupScreen = () => {
   return (
     <SafeAreaView style={styles.wrapper}>
       <View style={styles.header}>
-        {/* <ToastMessage status='' */}
         <TouchableOpacity onPress={() => handleClick()}>
           <Image source={frame} style={styles.backImg} />
         </TouchableOpacity>

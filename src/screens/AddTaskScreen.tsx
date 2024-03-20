@@ -24,36 +24,32 @@ const AddTaskScreen = () => {
   const {showToast} = useToast();
 
   const navigation = useNavigation();
-  const route = useRoute();
 
-  const {selectedYear, selectedMonth, selectedDate} = route.params;
-
-  const [dataExist, setDataExist] = useState<boolean>(false);
+  const [thisYear, setThisYear] = useState<string>('');
+  const [thisMonth, setThitMonth] = useState<string>('');
+  const [thisDay, setThisDay] = useState<string>('');
 
   const [todoGroup, setTodoGroup] = useState<WholeTodoList>({});
 
   const [todo, setTodo] = useState<string>('');
-  const [todoList, setTodoList] = React.useState<TodoItem[]>([]);
 
   const addTodoList = () => {
     let clonedData: WholeTodoList = todoGroup;
 
     if (Object.keys(clonedData).length !== 0) {
       if (todo.length > 0) {
-        if (clonedData[selectedYear] !== null) {
+        if (clonedData[thisYear] !== null) {
         } else {
-          clonedData[selectedYear] = {};
+          clonedData[thisYear] = {};
         }
 
-        if (clonedData[selectedYear][selectedMonth] !== undefined) {
+        if (clonedData[thisYear][thisMonth] !== undefined) {
         } else {
-          clonedData[selectedYear][selectedMonth] = {};
+          clonedData[thisYear][thisMonth] = {};
         }
 
-        if (
-          clonedData[selectedYear][selectedMonth][selectedDate] !== undefined
-        ) {
-          clonedData[selectedYear][selectedMonth][selectedDate].push({
+        if (clonedData[thisYear][thisMonth][thisDay] !== undefined) {
+          clonedData[thisYear][thisMonth][thisDay].push({
             todo: todo,
             done: false,
           });
@@ -61,7 +57,7 @@ const AddTaskScreen = () => {
           setTodo('');
           showToast('오늘할일을 꼭 마무리 하십쇼.', 'dkdk', 'success');
         } else {
-          clonedData[selectedYear][selectedMonth][selectedDate] = [
+          clonedData[thisYear][thisMonth][thisDay] = [
             {todo: todo, done: false},
           ];
           AsyncStorage.setItem('todos', JSON.stringify(clonedData));
@@ -70,9 +66,9 @@ const AddTaskScreen = () => {
         }
       }
     } else {
-      clonedData[selectedYear] = {};
-      clonedData[selectedYear][selectedMonth] = {};
-      clonedData[selectedYear][selectedMonth][selectedDate] = [
+      clonedData[thisYear] = {};
+      clonedData[thisYear][thisMonth] = {};
+      clonedData[thisYear][thisMonth][thisDay] = [
         {
           todo: todo,
           done: false,
@@ -102,6 +98,24 @@ const AddTaskScreen = () => {
     getData();
 
     getAllKeys();
+  }, []);
+
+  useEffect(() => {
+    const getData = async () => {
+      let results = await getStorageData('date');
+
+      if (results !== null) {
+        setThisYear(results.year);
+        setThitMonth(results.month);
+        setThisDay(results.day);
+      } else {
+        setThisYear(moment().format('YYYY'));
+        setThitMonth(moment().format('MM'));
+        setThisDay(moment().format('DD'));
+      }
+    };
+
+    getData();
   }, []);
 
   return (
