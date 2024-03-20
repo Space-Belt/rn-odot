@@ -12,6 +12,7 @@ import MainScreen from './screens/MainScreen';
 import {RecoilRoot} from 'recoil';
 import ToastMessage from './components/toastMessage/ToastMessage';
 import HorizontalMove from './components/HorizontalMove';
+import BottomSheet from './components/BottomSheet/BottomSheet';
 
 function App(): React.JSX.Element {
   return (
@@ -19,6 +20,7 @@ function App(): React.JSX.Element {
       <NavigationContainer>
         <MainScreen />
         <ToastMessage />
+        <BottomSheet />
       </NavigationContainer>
     </RecoilRoot>
   );
