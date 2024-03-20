@@ -29,7 +29,7 @@ const TodoListScreen = () => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
 
-  const {showBottomSheet} = useBottomSheet();
+  const {showBottomSheet, isVisible} = useBottomSheet();
 
   const [thisYear, setThisYear] = useState<string>('');
   const [thisMonth, setThitMonth] = useState<string>('');
@@ -117,7 +117,7 @@ const TodoListScreen = () => {
     if (isFocused) {
       getData();
     }
-  }, [isFocused]);
+  }, [isFocused, isVisible]);
 
   return (
     <View style={styles.wrapper}>

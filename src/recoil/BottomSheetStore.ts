@@ -41,5 +41,6 @@ export const useBottomSheet = () => {
   return {
     showBottomSheet,
     hideBottomSheet,
+    isVisible,
   };
 };
