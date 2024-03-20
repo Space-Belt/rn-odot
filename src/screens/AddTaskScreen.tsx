@@ -21,7 +21,7 @@ import {useToast} from '../recoil/ToastStore';
 import ToastMessage from '../components/toastMessage/ToastMessage';
 
 const AddTaskScreen = () => {
-  const {toast, showToast} = useToast();
+  const {showToast} = useToast();
 
   const navigation = useNavigation();
   const route = useRoute();
@@ -59,16 +59,14 @@ const AddTaskScreen = () => {
           });
           AsyncStorage.setItem('todos', JSON.stringify(clonedData));
           setTodo('');
-          // navigation.navigate('TodoListGroupScreen');
-          // show
-          showToast('아아', 'dkdk', 'a');
+          showToast('오늘할일을 꼭 마무리 하십쇼.', 'dkdk', 'success');
         } else {
           clonedData[selectedYear][selectedMonth][selectedDate] = [
             {todo: todo, done: false},
           ];
           AsyncStorage.setItem('todos', JSON.stringify(clonedData));
           setTodo('');
-          // navigation.navigate('TodoListGroupScreen');
+          showToast('오늘 첫 할일 등록했습니다. 화이팅!!', 'dkdk', 'success');
         }
       }
     } else {
@@ -82,8 +80,7 @@ const AddTaskScreen = () => {
       ];
       AsyncStorage.setItem('todos', JSON.stringify(clonedData));
       setTodo('');
-      showToast('아아', 'dkdk', 'a');
-      // navigation.navigate('TodoListGroupScreen');
+      showToast('할일 등록 성공!! 오늘도 화이팅', 'dkdk', 'success');
     }
   };
 
@@ -109,9 +106,6 @@ const AddTaskScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeWrapper}>
-      {toast.visible === true && (
-        <ToastMessage isVisible={toast.visible} status="FAIL" />
-      )}
       <View style={styles.wrapper}>
         <AddTaskHeader mb={20} title={'New Task'} />
         {/* 영역 */}
