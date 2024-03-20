@@ -25,11 +25,11 @@ const defaultParams = {
 
 const TodoListScreen = () => {
   const navigation = useNavigation();
-  const route = useRoute();
-  const params = route.params;
   const isFocused = useIsFocused();
 
-  const {selectedYear, selectedMonth, selectedDate} = params ?? defaultParams;
+  const [thisYear, setThisYear] = useState<string>('');
+  const [thisMonth, setThitMonth] = useState<string>('');
+  const [thisDay, setThisDay] = useState<string>('');
 
   const [odotList, setOdotList] = React.useState<TodoItem[]>([]);
 
@@ -40,16 +40,12 @@ const TodoListScreen = () => {
     let clonedOdotList: TodoItem[] = [...odotList];
     clonedOdotList[i].done = !clonedOdotList[i].done;
     setOdotList(clonedOdotList);
-    clonedFullData[selectedYear][selectedMonth][selectedDate] = clonedOdotList;
+    clonedFullData[thisYear][thisMonth][thisDay] = clonedOdotList;
     AsyncStorage.setItem('todos', JSON.stringify(clonedFullData));
   };
 
   const handlePlusClick = () => {
-    navigation.navigate('AddTaskScreen', {
-      selectedYear,
-      selectedMonth,
-      selectedDate,
-    });
+    navigation.navigate('AddTaskScreen');
   };
 
   const renderList = (todo: TodoItem, i: number) => {
@@ -81,48 +77,53 @@ const TodoListScreen = () => {
     );
   };
 
-  useEffect(() => {
-    const getDatas = async () => {
-      let results = await getStorageData('todos');
-      let todoList: TodoItem[] = [];
-
-      if (results === null) {
-        return;
-      }
-
-      if (results[selectedYear][selectedMonth][selectedDate]) {
-        results[selectedYear][selectedMonth][selectedDate].map(
-          (el: TodoItem) => {
-            todoList.push(el);
-          },
-        );
-      }
-
-      setFullData(results);
-      setOdotList(todoList);
-    };
-
-    if (isFocused) {
-      getDatas();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFocused, route.params]);
-
   const totalCount = odotList.length;
   const doneCount = odotList.filter(list => list.done).length;
   const percentage = (doneCount / totalCount) * 100;
 
   const percentStyle = [styles.percentage, {width: `${percentage}%`}];
 
+  const getDatas = async (y: string, m: string, d: string) => {
+    let results = await getStorageData('todos');
+    let todoList: TodoItem[] = [];
+
+    if (results === null) {
+      return;
+    }
+
+    setFullData(results);
+    setOdotList(results[y][m][d]);
+  };
+
+  useEffect(() => {
+    const getData = async () => {
+      let results = await getStorageData('date');
+      console.log(results);
+      if (results !== null) {
+        setThisYear(results.year);
+        setThitMonth(results.month);
+        setThisDay(results.day);
+      } else {
+        setThisYear(moment().format('YYYY'));
+        setThitMonth(moment().format('MM'));
+        setThisDay(moment().format('DD'));
+      }
+      getDatas(results.year, results.month, results.day);
+    };
+    if (isFocused) {
+      getData();
+    }
+  }, [isFocused]);
+
   return (
     <View style={styles.wrapper}>
       <SafeAreaView style={{flex: 1}}>
         {/* 앱에서는 네비게이션이함 nav */}
         <MainHeader />
-        <View>
-          {route.params ?? (
-            <Text>{`${selectedYear}/${selectedMonth}/${selectedDate}`}</Text>
-          )}
+        <View style={styles.dateWrapper}>
+          <Text>
+            {thisYear}/{thisMonth}/{thisDay}
+          </Text>
         </View>
         <View style={styles.textInputArea}>
           <Text style={styles.progressTextStyle}>progress</Text>
@@ -142,7 +143,9 @@ const TodoListScreen = () => {
           {odotList.length > 0 ? (
             odotList.map((el: TodoItem, i: number) => renderList(el, i))
           ) : (
-            <Text>할일을 등록해주세요!</Text>
+            <View style={styles.emptyView}>
+              <Text>할일을 등록해주세요!</Text>
+            </View>
           )}
         </ScrollView>
         <TouchableHighlight
@@ -167,7 +170,12 @@ const styles = StyleSheet.create({
     height: '100%',
     paddingVertical: 10,
   },
-
+  emptyView: {
+    flex: 1,
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   textInputArea: {
     padding: 15,
     borderRadius: 12,
@@ -239,5 +247,8 @@ const styles = StyleSheet.create({
     height: 10,
     borderRadius: 10,
     backgroundColor: '#FF7461',
+  },
+  dateWrapper: {
+    paddingHorizontal: 20,
   },
 });
