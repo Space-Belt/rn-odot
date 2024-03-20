@@ -16,6 +16,8 @@ import {TodoItem, WholeTodoList} from '../types/todos';
 import MainHeader from '../components/Headers/MainHeader';
 import {getStorageData} from '../lib/storage-helper';
 import moment from 'moment';
+import {useBottomSheet} from '../recoil/BottomSheetStore';
+import NewTaskBottomsheet from '../components/NewTask/NewTaskBottomsheet';
 
 const defaultParams = {
   selectedYear: '',
@@ -26,6 +28,8 @@ const defaultParams = {
 const TodoListScreen = () => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
+
+  const {showBottomSheet} = useBottomSheet();
 
   const [thisYear, setThisYear] = useState<string>('');
   const [thisMonth, setThitMonth] = useState<string>('');
@@ -45,7 +49,7 @@ const TodoListScreen = () => {
   };
 
   const handlePlusClick = () => {
-    navigation.navigate('AddTaskScreen');
+    showBottomSheet(<NewTaskBottomsheet />);
   };
 
   const renderList = (todo: TodoItem, i: number) => {
