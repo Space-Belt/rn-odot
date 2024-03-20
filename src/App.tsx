@@ -11,6 +11,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import MainScreen from './screens/MainScreen';
 import {RecoilRoot} from 'recoil';
 import ToastMessage from './components/toastMessage/ToastMessage';
+import HorizontalMove from './components/HorizontalMove';
 
 function App(): React.JSX.Element {
   return (
