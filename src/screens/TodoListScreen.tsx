@@ -257,5 +257,8 @@ const styles = StyleSheet.create({
   },
   dateWrapper: {
     paddingHorizontal: 20,
+    backgroundColor: '#FF7461',
+    color: 'white',
+    fontWeight: '700',
   },
 });
