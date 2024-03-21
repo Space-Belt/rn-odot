@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View, ViewStyle} from 'react-native';
 import React from 'react';
 import {TodoItem} from '../../../types/todos';
 
@@ -15,7 +15,10 @@ const ProgressBar = ({
   totalCount,
   odotList,
 }: Props) => {
-  const percentStyle = [styles.percentage, {width: `${percentageWidth}%`}];
+  const percentStyle: ViewStyle[] = [
+    styles.percentage,
+    {width: `${percentageWidth}%`},
+  ];
 
   return (
     <View style={styles.textInputArea}>
