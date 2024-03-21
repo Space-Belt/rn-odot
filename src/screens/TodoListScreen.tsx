@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 
-import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
+import {useIsFocused} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {TodoItem, WholeTodoList} from '../types/todos';
 import MainHeader from '../components/Headers/MainHeader';
@@ -20,14 +20,7 @@ import {useBottomSheet} from '../recoil/BottomSheetStore';
 import NewTaskBottomsheet from '../components/NewTask/NewTaskBottomsheet';
 import {useToast} from '../recoil/ToastStore';
 
-const defaultParams = {
-  selectedYear: '',
-  selectedMonth: '',
-  selectedDate: '',
-};
-
 const TodoListScreen = () => {
-  const navigation = useNavigation();
   const isFocused = useIsFocused();
 
   const {showBottomSheet} = useBottomSheet();
@@ -128,7 +121,7 @@ const TodoListScreen = () => {
         {/* 앱에서는 네비게이션이함 nav */}
         <MainHeader />
         <View style={styles.dateWrapper}>
-          <Text>
+          <Text style={styles.dateText}>
             {thisYear}/{thisMonth}/{thisDay}
           </Text>
         </View>
@@ -257,8 +250,24 @@ const styles = StyleSheet.create({
   },
   dateWrapper: {
     paddingHorizontal: 20,
-    backgroundColor: '#FF7461',
-    color: 'white',
     fontWeight: '700',
+    alignItems: 'center',
+  },
+  dateText: {
+    width: 100,
+    color: '#333',
+    textAlign: 'center',
+    paddingVertical: 5,
+    marginBottom: 5,
+    fontWeight: '700',
+    elevation: 5,
+    // iOS
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.4,
+    shadowRadius: 3.84,
   },
 });
