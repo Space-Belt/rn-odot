@@ -19,6 +19,7 @@ import moment from 'moment';
 import {useBottomSheet} from '../recoil/BottomSheetStore';
 import NewTaskBottomsheet from '../components/NewTask/NewTaskBottomsheet';
 import {useToast} from '../recoil/ToastStore';
+import ProgressBar from '../components/\bTodo/Progress/ProgressBar';
 
 const TodoListScreen = () => {
   const isFocused = useIsFocused();
@@ -77,11 +78,11 @@ const TodoListScreen = () => {
     );
   };
 
-  const totalCount = odotList.length;
-  const doneCount = odotList.filter(list => list.done).length;
-  const percentage = (doneCount / totalCount) * 100;
+  const totalCount = odotList ? odotList.length : 1;
+  const doneCount = odotList ? odotList.filter(list => list.done).length : 1;
+  const percentageWidth = (doneCount / totalCount) * 100;
 
-  const percentStyle = [styles.percentage, {width: `${percentage}%`}];
+  const percentStyle = [styles.percentage, {width: `${percentageWidth}%`}];
 
   const getDatas = async (y: string, m: string, d: string) => {
     let results = await getStorageData('todos');
@@ -125,28 +126,17 @@ const TodoListScreen = () => {
             {thisYear}/{thisMonth}/{thisDay}
           </Text>
         </View>
-        <View style={styles.textInputArea}>
-          <Text style={styles.progressTextStyle}>progress</Text>
-          <View style={styles.percentageArea}>
-            <View style={styles.emptyPercentage}>
-              <View style={percentStyle} />
-            </View>
-          </View>
-          <View>
-            <Text
-              style={styles.countText}>{`${doneCount} / ${totalCount}`}</Text>
-          </View>
-        </View>
+        <ProgressBar
+          percentageWidth={percentageWidth}
+          doneCount={doneCount}
+          totalCount={totalCount}
+          odotList={odotList}
+        />
 
         {/* 투두 부분 */}
         <ScrollView style={styles.scrollViewStyle}>
-          {odotList.length > 0 ? (
-            odotList.map((el: TodoItem, i: number) => renderList(el, i))
-          ) : (
-            <View style={styles.emptyView}>
-              <Text>할일을 등록해주세요!</Text>
-            </View>
-          )}
+          {odotList?.length > 0 &&
+            odotList.map((el: TodoItem, i: number) => renderList(el, i))}
         </ScrollView>
         <TouchableHighlight
           onPress={handlePlusClick}
@@ -172,7 +162,6 @@ const styles = StyleSheet.create({
   },
   emptyView: {
     flex: 1,
-    height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -234,7 +223,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   todoStyle: {marginLeft: 5},
-  scrollViewStyle: {paddingHorizontal: 25},
+  scrollViewStyle: {flex: 1, paddingHorizontal: 25},
 
   checkImg: {
     width: 25,
