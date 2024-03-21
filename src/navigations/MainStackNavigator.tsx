@@ -13,12 +13,12 @@ const MainStackNavigator = () => {
   return (
     <MainStack.Navigator
       screenOptions={{headerShown: false}}
-      initialRouteName="TodoListGroupScreen">
+      initialRouteName="TodoListScreen">
+      <MainStack.Screen name="TodoListScreen" component={TodoListScreen} />
       <MainStack.Screen
         name="TodoListGroupScreen"
         component={TodoListGroupScreen}
       />
-      <MainStack.Screen name="TodoListScreen" component={TodoListScreen} />
       <MainStack.Screen name="AddTaskScreen" component={AddTaskScreen} />
       <MainStack.Screen name="FlatListScreen" component={FlatListScreen} />
       <MainStack.Screen
