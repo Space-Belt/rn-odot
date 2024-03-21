@@ -1,6 +1,12 @@
 import {StyleSheet, Text, View, ViewStyle} from 'react-native';
 import React from 'react';
 import {TodoItem} from '../../../types/todos';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 
 type Props = {
   percentageWidth: number;
@@ -15,17 +21,24 @@ const ProgressBar = ({
   totalCount,
   odotList,
 }: Props) => {
-  const percentStyle: ViewStyle[] = [
-    styles.percentage,
-    {width: `${percentageWidth}%`},
-  ];
+  const percentWidth = useSharedValue<number>(0);
+
+  const percentageBarStyle = useAnimatedStyle(() => {
+    return {
+      width: `${percentWidth.value}%`,
+    };
+  });
+
+  React.useEffect(() => {
+    percentWidth.value = withSpring(percentageWidth, {duration: 600});
+  }, [percentageWidth]);
 
   return (
     <View style={styles.textInputArea}>
       <Text style={styles.progressTextStyle}>progress</Text>
       <View style={styles.percentageArea}>
         <View style={styles.emptyPercentage}>
-          <View style={percentStyle} />
+          <Animated.View style={[styles.percentage, percentageBarStyle]} />
         </View>
       </View>
       <View>
