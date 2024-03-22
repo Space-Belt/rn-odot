@@ -1,3 +1,4 @@
+import React, {useEffect, useState} from 'react';
 import {
   Image,
   SafeAreaView,
@@ -8,18 +9,19 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
 
-import {useIsFocused} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {TodoItem, WholeTodoList} from '../types/todos';
-import MainHeader from '../components/Headers/MainHeader';
-import {getStorageData} from '../lib/storage-helper';
+import {useIsFocused} from '@react-navigation/native';
 import moment from 'moment';
-import {useBottomSheet} from '../recoil/BottomSheetStore';
+
+import MainHeader from '../components/Headers/MainHeader';
 import NewTaskBottomsheet from '../components/NewTask/NewTaskBottomsheet';
+
+import {getStorageData} from '../lib/storage-helper';
+import {useBottomSheet} from '../recoil/BottomSheetStore';
 import {useToast} from '../recoil/ToastStore';
-import ProgressBar from '../components/\bTodo/Progress/ProgressBar';
+import {TodoItem, WholeTodoList} from '../types/todos';
+import ProgressBar from '../components/Todo/Progress/ProgressBar';
 
 const TodoListScreen = () => {
   const isFocused = useIsFocused();
