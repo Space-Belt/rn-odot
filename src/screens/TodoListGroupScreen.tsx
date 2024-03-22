@@ -13,6 +13,7 @@ import {useIsFocused, useNavigation} from '@react-navigation/native';
 import frame from '../assets/images/Frame.png';
 import moment from 'moment';
 import {getStorageData} from '../lib/storage-helper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface Item {
   id: number;
@@ -54,17 +55,21 @@ const TodoListGroupScreen = () => {
   };
 
   const handleAddTask = () => {
-    navigation.navigate('AddTaskScreen', {
-      selectedYear: year,
-      selectedMonth: month,
-      selectedDate: date,
-    });
+    AsyncStorage.setItem(
+      'date',
+      JSON.stringify({
+        year: year,
+        month: month,
+        day: date,
+      }),
+    );
+    navigation.navigate('AddTaskScreen');
   };
   const [todoData, setTodoData] = useState<TempType[]>([]);
 
   const renderSectionHeader = ({section}: {section: any}) => {
     return (
-      <View>
+      <View style={styles.sectionHeader}>
         <Text>{section.title}</Text>
       </View>
     );
@@ -72,11 +77,15 @@ const TodoListGroupScreen = () => {
 
   const handleListClicked = (date: string) => {
     let [clickedYear, clickedMonth, clickedDate] = date.split('/');
-    navigation.navigate('TodoListScreen', {
-      selectedYear: clickedYear,
-      selectedMonth: clickedMonth,
-      selectedDate: clickedDate,
-    });
+    AsyncStorage.setItem(
+      'date',
+      JSON.stringify({
+        year: clickedYear,
+        month: clickedMonth,
+        day: clickedDate,
+      }),
+    );
+    navigation.navigate('TodoListScreen');
   };
 
   const keyExtractor = (item: TempType) =>
@@ -142,7 +151,7 @@ const TodoListGroupScreen = () => {
           }
         }
       }
-      setTodoData(processedData);
+      setTodoData(processedData.reverse());
       setSections(createSections(processedData));
     };
     if (isFocused) {
@@ -244,6 +253,9 @@ const styles = StyleSheet.create({
   dateText: {
     fontWeight: '600',
     fontSize: 16,
+  },
+  sectionHeader: {
+    backgroundColor: '#F2F2F2',
   },
   sectionStyle: {gap: 10},
   countText: {
