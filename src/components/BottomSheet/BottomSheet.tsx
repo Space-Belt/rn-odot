@@ -47,12 +47,17 @@ const BottomSheet = () => {
   };
 
   const sheetAnimatedStyle = useAnimatedStyle(() => {
-    if (bottomSheetHeight * 0.7 > sheetHeight.value) {
+    if (bottomSheetHeight * 0.8 > sheetHeight.value) {
       runOnJS(setIsVisible)({isBottomSheetVisible: false});
       translateY.value = bottomSheetHeight;
       sheetHeight.value = bottomSheetHeight;
+    } else if (screenHeight <= sheetHeight.value) {
+      sheetHeight.value = screenHeight - 100;
+      return {
+        transform: [{translateY: translateY.value}],
+        height: sheetHeight.value,
+      };
     }
-
     return {
       transform: [{translateY: translateY.value}],
       height: sheetHeight.value,
@@ -82,7 +87,11 @@ const BottomSheet = () => {
       const timeout = setTimeout(() => {
         setIsOn(false);
       }, 200);
-      return () => clearTimeout(timeout);
+      return () => {
+        clearTimeout(timeout);
+        translateY.value = bottomSheetHeight;
+        sheetHeight.value = bottomSheetHeight;
+      };
     }
   }, [isVisible.isBottomSheetVisible]);
 
@@ -109,8 +118,8 @@ const BottomSheet = () => {
     <>
       {isVisible.isBottomSheetVisible && (
         <Animated.View
-          entering={FadeIn.duration(1000)}
-          exiting={FadeOut.duration(1000)}
+          entering={FadeIn.duration(200)}
+          exiting={FadeOut.duration(200)}
           style={styles.backgroundWrapper}>
           <TouchableWithoutFeedback onPress={handleBackgroundClick}>
             <View style={styles.overlay} />
@@ -118,14 +127,15 @@ const BottomSheet = () => {
         </Animated.View>
       )}
       {isOn && (
-        <Animated.View style={[styles.bottomSheetWrapper, sheetAnimatedStyle]}>
-          <GestureDetector gesture={panGestureEvent}>
+        <GestureDetector gesture={panGestureEvent}>
+          <Animated.View
+            style={[styles.bottomSheetWrapper, sheetAnimatedStyle]}>
             <View style={styles.gestureBarWrapper}>
               <View style={styles.gestureBar} />
             </View>
-          </GestureDetector>
-          {content.content}
-        </Animated.View>
+            {content.content}
+          </Animated.View>
+        </GestureDetector>
       )}
     </>
   );
@@ -148,6 +158,7 @@ const styles = StyleSheet.create({
     width: '100%',
     position: 'absolute',
     bottom: 0,
+    backgroundColor: '#fff',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 25,
@@ -157,14 +168,14 @@ const styles = StyleSheet.create({
   gestureBarWrapper: {
     left: 25,
     width: '100%',
-    height: 10,
+    height: 15,
     position: 'absolute',
     justifyContent: 'center',
     alignItems: 'center',
   },
   gestureBar: {
     width: 25,
-    height: 5,
+    height: 7,
     backgroundColor: '#C1C1C1',
     borderRadius: 2,
   },
