@@ -1,4 +1,5 @@
 import {
+  BackHandler,
   Dimensions,
   StyleSheet,
   Text,
@@ -7,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import React from 'react';
-import {useRecoilValue} from 'recoil';
+import {useRecoilState, useRecoilValue} from 'recoil';
 import {
   bottomSheetContent,
   bottomSheetVisibleState,
@@ -26,18 +27,20 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 
 const screenHeight = Dimensions.get('window').height;
 const bottomSheetHeight = screenHeight * 0.4;
 
 const BottomSheet = () => {
   const content = useRecoilValue(bottomSheetContent);
-  const isVisible = useRecoilValue(bottomSheetVisibleState);
+  const [isVisible, setIsVisible] = useRecoilState(bottomSheetVisibleState);
 
   const [isOn, setIsOn] = React.useState<boolean>(false);
 
   // const bottom = useSharedValue(0);
   const top = useSharedValue(screenHeight);
+  const containerHeight = useSharedValue(bottomSheetHeight);
 
   const {hideBottomSheet} = useBottomSheet();
 
@@ -45,20 +48,37 @@ const BottomSheet = () => {
     hideBottomSheet();
   };
 
+  const sheetAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      top: top.value,
+      height: containerHeight.value,
+    };
+  });
+
+  const startY = useSharedValue(0);
+  const panGestureEvent = Gesture.Pan()
+    .onStart(() => {
+      // 처음의 값 저장
+      startY.value = containerHeight.value;
+    })
+    .onUpdate(event => {
+      // 찍어보기
+      console.log(event.translationY);
+
+      // let tempValue = top.value + event.translationY;
+      // let temp = containerHeight.value - event.translationY;
+      // top.value = withTiming(tempValue);
+      // containerHeight.value = withTiming(startY.value + -event.translationY);
+      containerHeight.value = withTiming(startY.value + -event.translationY);
+    });
+
   React.useEffect(() => {
     if (isVisible.isBottomSheetVisible) {
       setIsOn(true);
       top.value = withTiming(screenHeight - bottomSheetHeight, {
         duration: 400,
       });
-      // setIsOn(true);
-      // bottom.value = withTiming(bottomSheetHeight, {
-      //   duration: 700,
-      // });
     } else {
-      // bottom.value = withTiming(0, {
-      //   duration: 700,
-      // });
       top.value = withTiming(screenHeight, {
         duration: 400,
       });
@@ -69,17 +89,19 @@ const BottomSheet = () => {
     }
   }, [isVisible.isBottomSheetVisible]);
 
-  //
-  const sheetAnimatedStyle = useAnimatedStyle(() => {
-    // return {
-    //   height: bottom.value,
-    //   paddingHorizontal: 10,
-    //   paddingVertical: 10,
-    // };
-    return {
-      top: top.value,
+  React.useEffect(() => {
+    const handlePressBackButton = () => {
+      setIsVisible({isBottomSheetVisible: false});
+      return false;
     };
-  });
+    BackHandler.addEventListener('hardwareBackPress', () =>
+      handlePressBackButton(),
+    );
+
+    return BackHandler.removeEventListener('hardwareBackPress', () =>
+      handlePressBackButton(),
+    );
+  }, []);
 
   return (
     <>
@@ -95,6 +117,9 @@ const BottomSheet = () => {
       )}
       {isOn && (
         <Animated.View style={[styles.bottomSheetWrapper, sheetAnimatedStyle]}>
+          <GestureDetector gesture={panGestureEvent}>
+            <View style={styles.gestureBar} />
+          </GestureDetector>
           {content.content}
         </Animated.View>
       )}
@@ -125,5 +150,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25,
     paddingVertical: 25,
     zIndex: 10,
+  },
+  gestureBar: {
+    width: 25,
+    height: 4,
+    backgroundColor: '#C1C1C1',
+    borderRadius: 2,
+    position: 'absolute',
+    top: 2,
+    left: '50%',
+    transform: [{translateX: 25 / 2}],
   },
 });
