@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   dateText: {
-    width: 100,
+    width: 110,
     color: '#333',
     textAlign: 'center',
     paddingVertical: 5,
