@@ -40,7 +40,7 @@ const BottomSheet = () => {
 
   // const bottom = useSharedValue(0);
   const top = useSharedValue(screenHeight);
-  const containerHeight = useSharedValue(bottomSheetHeight);
+  const sheetHeight = useSharedValue(bottomSheetHeight);
 
   const {hideBottomSheet} = useBottomSheet();
 
@@ -51,25 +51,26 @@ const BottomSheet = () => {
   const sheetAnimatedStyle = useAnimatedStyle(() => {
     return {
       top: top.value,
-      height: containerHeight.value,
+      height: sheetHeight.value,
     };
   });
 
+  const startHeight = useSharedValue(0);
   const startY = useSharedValue(0);
+
   const panGestureEvent = Gesture.Pan()
     .onStart(() => {
-      // 처음의 값 저장
-      startY.value = containerHeight.value;
+      startHeight.value = sheetHeight.value;
+      startY.value = top.value;
     })
     .onUpdate(event => {
-      // 찍어보기
       console.log(event.translationY);
-
-      // let tempValue = top.value + event.translationY;
-      // let temp = containerHeight.value - event.translationY;
-      // top.value = withTiming(tempValue);
-      // containerHeight.value = withTiming(startY.value + -event.translationY);
-      containerHeight.value = withTiming(startY.value + -event.translationY);
+      sheetHeight.value = withTiming(startHeight.value + -event.translationY, {
+        duration: 1,
+      });
+      top.value = withTiming(startY.value + event.translationY, {
+        duration: 1,
+      });
     });
 
   React.useEffect(() => {
@@ -153,7 +154,7 @@ const styles = StyleSheet.create({
   },
   gestureBar: {
     width: 25,
-    height: 4,
+    height: 10,
     backgroundColor: '#C1C1C1',
     borderRadius: 2,
     position: 'absolute',
