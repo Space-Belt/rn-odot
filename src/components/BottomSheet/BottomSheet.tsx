@@ -35,21 +35,23 @@ const bottomSheetHeight = screenHeight * 0.4;
 const BottomSheet = () => {
   const content = useRecoilValue(bottomSheetContent);
   const [isVisible, setIsVisible] = useRecoilState(bottomSheetVisibleState);
+  const {hideBottomSheet} = useBottomSheet();
 
   const [isOn, setIsOn] = React.useState<boolean>(false);
 
   const translateY = useSharedValue(bottomSheetHeight);
   const sheetHeight = useSharedValue(bottomSheetHeight);
 
-  const {hideBottomSheet} = useBottomSheet();
-
   const handleBackgroundClick = () => {
     hideBottomSheet();
   };
 
   const sheetAnimatedStyle = useAnimatedStyle(() => {
-    // if()
-    console.log(sheetHeight.value);
+    if (bottomSheetHeight * 0.7 > sheetHeight.value) {
+      runOnJS(setIsVisible)({isBottomSheetVisible: false});
+      translateY.value = bottomSheetHeight;
+      sheetHeight.value = bottomSheetHeight;
+    }
 
     return {
       transform: [{translateY: translateY.value}],
@@ -58,7 +60,6 @@ const BottomSheet = () => {
   });
 
   const startHeight = useSharedValue(0);
-  const startY = useSharedValue(0);
 
   const panGestureEvent = Gesture.Pan()
     .onStart(() => {
@@ -72,15 +73,15 @@ const BottomSheet = () => {
     if (isVisible.isBottomSheetVisible) {
       setIsOn(true);
       translateY.value = withTiming(0, {
-        duration: 400,
+        duration: 200,
       });
     } else {
       translateY.value = withTiming(screenHeight, {
-        duration: 400,
+        duration: 200,
       });
       const timeout = setTimeout(() => {
         setIsOn(false);
-      }, 400);
+      }, 200);
       return () => clearTimeout(timeout);
     }
   }, [isVisible.isBottomSheetVisible]);
@@ -119,7 +120,7 @@ const BottomSheet = () => {
       {isOn && (
         <Animated.View style={[styles.bottomSheetWrapper, sheetAnimatedStyle]}>
           <GestureDetector gesture={panGestureEvent}>
-            <View>
+            <View style={styles.gestureBarWrapper}>
               <View style={styles.gestureBar} />
             </View>
           </GestureDetector>
@@ -141,29 +142,30 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    // backgroundColor: 'rgba(0,0,0,0.5)',
-    backgroundColor: 'rgba(0,0,0,0.1)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
   bottomSheetWrapper: {
-    // height: bottomSheetHeight,
     width: '100%',
     position: 'absolute',
     bottom: 0,
-    backgroundColor: 'red',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 25,
     paddingVertical: 25,
     zIndex: 10,
   },
+  gestureBarWrapper: {
+    left: 25,
+    width: '100%',
+    height: 10,
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   gestureBar: {
     width: 25,
-    height: 10,
+    height: 5,
     backgroundColor: '#C1C1C1',
     borderRadius: 2,
-    position: 'absolute',
-    top: 2,
-    left: '50%',
-    transform: [{translateX: 25 / 2}],
   },
 });
