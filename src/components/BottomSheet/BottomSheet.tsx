@@ -38,8 +38,7 @@ const BottomSheet = () => {
 
   const [isOn, setIsOn] = React.useState<boolean>(false);
 
-  // const bottom = useSharedValue(0);
-  const top = useSharedValue(screenHeight);
+  const translateY = useSharedValue(bottomSheetHeight);
   const sheetHeight = useSharedValue(bottomSheetHeight);
 
   const {hideBottomSheet} = useBottomSheet();
@@ -49,8 +48,11 @@ const BottomSheet = () => {
   };
 
   const sheetAnimatedStyle = useAnimatedStyle(() => {
+    // if()
+    console.log(sheetHeight.value);
+
     return {
-      top: top.value,
+      transform: [{translateY: translateY.value}],
       height: sheetHeight.value,
     };
   });
@@ -61,26 +63,19 @@ const BottomSheet = () => {
   const panGestureEvent = Gesture.Pan()
     .onStart(() => {
       startHeight.value = sheetHeight.value;
-      startY.value = top.value;
     })
     .onUpdate(event => {
-      console.log(event.translationY);
-      sheetHeight.value = withTiming(startHeight.value + -event.translationY, {
-        duration: 1,
-      });
-      top.value = withTiming(startY.value + event.translationY, {
-        duration: 1,
-      });
+      sheetHeight.value = startHeight.value - event.translationY;
     });
 
   React.useEffect(() => {
     if (isVisible.isBottomSheetVisible) {
       setIsOn(true);
-      top.value = withTiming(screenHeight - bottomSheetHeight, {
+      translateY.value = withTiming(0, {
         duration: 400,
       });
     } else {
-      top.value = withTiming(screenHeight, {
+      translateY.value = withTiming(screenHeight, {
         duration: 400,
       });
       const timeout = setTimeout(() => {
@@ -89,6 +84,11 @@ const BottomSheet = () => {
       return () => clearTimeout(timeout);
     }
   }, [isVisible.isBottomSheetVisible]);
+
+  React.useEffect(() => {
+    console.log('dfdfdfdfdf');
+    console.log(sheetHeight.value);
+  }, [sheetHeight.value]);
 
   React.useEffect(() => {
     const handlePressBackButton = () => {
@@ -119,7 +119,9 @@ const BottomSheet = () => {
       {isOn && (
         <Animated.View style={[styles.bottomSheetWrapper, sheetAnimatedStyle]}>
           <GestureDetector gesture={panGestureEvent}>
-            <View style={styles.gestureBar} />
+            <View>
+              <View style={styles.gestureBar} />
+            </View>
           </GestureDetector>
           {content.content}
         </Animated.View>
@@ -139,13 +141,15 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    // backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.1)',
   },
   bottomSheetWrapper: {
-    height: bottomSheetHeight,
+    // height: bottomSheetHeight,
     width: '100%',
     position: 'absolute',
-    backgroundColor: 'white',
+    bottom: 0,
+    backgroundColor: 'red',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 25,
