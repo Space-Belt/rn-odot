@@ -1,4 +1,3 @@
-import {ViewStyle} from 'react-native';
 import {atom, useRecoilState} from 'recoil';
 
 interface IToastMessage {

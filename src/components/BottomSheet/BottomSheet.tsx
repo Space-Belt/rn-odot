@@ -78,15 +78,15 @@ const BottomSheet = () => {
     if (isVisible.isBottomSheetVisible) {
       setIsOn(true);
       translateY.value = withTiming(0, {
-        duration: 200,
+        duration: 500,
       });
     } else {
       translateY.value = withTiming(screenHeight, {
-        duration: 200,
+        duration: 500,
       });
       const timeout = setTimeout(() => {
         setIsOn(false);
-      }, 200);
+      }, 500);
       return () => {
         clearTimeout(timeout);
         translateY.value = bottomSheetHeight;
@@ -118,8 +118,8 @@ const BottomSheet = () => {
     <>
       {isVisible.isBottomSheetVisible && (
         <Animated.View
-          entering={FadeIn.duration(200)}
-          exiting={FadeOut.duration(200)}
+          entering={FadeIn.duration(300)}
+          exiting={FadeOut.duration(300)}
           style={styles.backgroundWrapper}>
           <TouchableWithoutFeedback onPress={handleBackgroundClick}>
             <View style={styles.overlay} />
