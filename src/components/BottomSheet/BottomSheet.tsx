@@ -52,7 +52,7 @@ const BottomSheet = () => {
       translateY.value = bottomSheetHeight;
       sheetHeight.value = bottomSheetHeight;
     } else if (screenHeight <= sheetHeight.value) {
-      sheetHeight.value = screenHeight - 100;
+      sheetHeight.value = screenHeight;
       return {
         transform: [{translateY: translateY.value}],
         height: sheetHeight.value,
