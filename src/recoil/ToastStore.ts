@@ -3,13 +3,11 @@ import {atom, useRecoilState} from 'recoil';
 interface IToastMessage {
   type: string;
   message: string;
-  subMessage: string;
 }
 
 const initialToastState: IToastMessage = {
   type: '',
   message: '',
-  subMessage: '',
 };
 
 export const toastContent = atom<IToastMessage>({
@@ -26,16 +24,15 @@ export const useToast = () => {
   const [toastMessage, setToastMessage] = useRecoilState(toastContent);
   const [isVisible, setIsVisible] = useRecoilState(toastVisibility);
 
-  const showToast = (message: string, subMessage: string, type: string) => {
+  const showToast = (message: string, type: string) => {
     setToastMessage({
       message: message,
-      subMessage: subMessage,
       type: type,
     });
     setIsVisible(true);
 
     setTimeout(() => {
-      setToastMessage({message: '', subMessage: '', type: ''});
+      setToastMessage({message: '', type: ''});
       setIsVisible(false);
     }, 2300);
   };

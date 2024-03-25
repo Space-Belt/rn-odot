@@ -48,7 +48,7 @@ const NewTaskBottomsheet = () => {
           });
           AsyncStorage.setItem('todos', JSON.stringify(clonedData));
           setTodo('');
-          showToast('오늘할일을 꼭 마무리 하십쇼.', 'dkdk', 'success');
+          showToast('오늘할일을 꼭 마무리 하십쇼.', 'success');
           hideBottomSheet();
         } else {
           clonedData[thisYear][thisMonth][thisDay] = [
@@ -56,11 +56,11 @@ const NewTaskBottomsheet = () => {
           ];
           AsyncStorage.setItem('todos', JSON.stringify(clonedData));
           setTodo('');
-          showToast('오늘 첫 할일 등록했습니다. 화이팅!!', 'dkdk', 'success');
+          showToast('오늘 첫 할일 등록했습니다. 화이팅!!', 'success');
           hideBottomSheet();
         }
       } else {
-        showToast('한글자 이상 부터 등록됩니다.', '', 'error');
+        showToast('한글자 이상 부터 등록됩니다.', 'error');
       }
     } else {
       clonedData[thisYear] = {};
@@ -73,7 +73,7 @@ const NewTaskBottomsheet = () => {
       ];
       AsyncStorage.setItem('todos', JSON.stringify(clonedData));
       setTodo('');
-      showToast('할일 등록 성공!! 오늘도 화이팅', 'dkdk', 'success');
+      showToast('할일 등록 성공!! 오늘도 화이팅', 'success');
       hideBottomSheet();
     }
   };
