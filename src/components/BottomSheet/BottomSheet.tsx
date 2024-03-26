@@ -18,6 +18,7 @@ import Animated, {
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
+  withSpring,
   withTiming,
 } from 'react-native-reanimated';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
@@ -43,13 +44,14 @@ const BottomSheet = () => {
   };
 
   const sheetAnimatedStyle = useAnimatedStyle(() => {
-    if (bottomSheetHeight * 0.8 > sheetHeight.value) {
+    if (bottomSheetHeight * 0.7 > sheetHeight.value) {
       runOnJS(setIsVisible)({isBottomSheetVisible: false});
-      translateY.value = bottomSheetHeight;
-      sheetHeight.value = bottomSheetHeight;
+      // translateY.value = bottomSheetHeight;
+      // sheetHeight.value = bottomSheetHeight;
     } else if (screenHeight <= sheetHeight.value) {
       console.log(statusBarHeight);
-      sheetHeight.value = screenHeight - statusBarHeight;
+      sheetHeight.value = withSpring(screenHeight - statusBarHeight);
+
       return {
         transform: [{translateY: translateY.value}],
         height: sheetHeight.value,
