@@ -2,8 +2,6 @@ import {
   BackHandler,
   Dimensions,
   StyleSheet,
-  Text,
-  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
@@ -15,19 +13,15 @@ import {
   useBottomSheet,
 } from '../../recoil/BottomSheetStore';
 import Animated, {
-  BounceIn,
-  BounceInUp,
-  BounceOut,
-  EntryExitTransition,
   FadeIn,
   FadeOut,
-  JumpingTransition,
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
+import {getStatusBarHeight} from 'react-native-safearea-height';
 
 const screenHeight = Dimensions.get('window').height;
 const bottomSheetHeight = screenHeight * 0.4;
@@ -36,6 +30,8 @@ const BottomSheet = () => {
   const content = useRecoilValue(bottomSheetContent);
   const [isVisible, setIsVisible] = useRecoilState(bottomSheetVisibleState);
   const {hideBottomSheet} = useBottomSheet();
+
+  const statusBarHeight = getStatusBarHeight(true);
 
   const [isOn, setIsOn] = React.useState<boolean>(false);
 
@@ -52,7 +48,8 @@ const BottomSheet = () => {
       translateY.value = bottomSheetHeight;
       sheetHeight.value = bottomSheetHeight;
     } else if (screenHeight <= sheetHeight.value) {
-      sheetHeight.value = screenHeight;
+      console.log(statusBarHeight);
+      sheetHeight.value = screenHeight - statusBarHeight;
       return {
         transform: [{translateY: translateY.value}],
         height: sheetHeight.value,

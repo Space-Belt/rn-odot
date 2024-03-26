@@ -15,7 +15,7 @@ import {navigationRef} from './lib/navigation';
 import MainScreen from './screens/MainScreen';
 import 'react-native-gesture-handler';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import {StyleSheet} from 'react-native';
+import {SafeAreaView, StyleSheet} from 'react-native';
 function App(): React.JSX.Element {
   return (
     <GestureHandlerRootView style={styles.wrapper}>
