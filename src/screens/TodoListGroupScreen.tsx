@@ -132,17 +132,21 @@ const TodoListGroupScreen = () => {
       if (results !== null) {
         for (const [tempYear, tempMonths] of Object.entries(results)) {
           for (const [tempMonth, tempDays] of Object.entries(
-            tempMonths as Object,
+            tempMonths as {[key: string]: TempType[]},
           )) {
             for (const [todo, todos] of Object.entries(tempDays)) {
               let dateInfo = `${tempYear}/${tempMonth}/${todo}`;
-              let doneCount = 0;
+              // let doneCount = 0;
 
-              todos.map(todoEl => {
-                if (todoEl.done === true) {
-                  doneCount += 1;
-                }
-              });
+              let doneCount = todos.filter(
+                todoEl => todoEl.done === true,
+              ).length;
+
+              // todos.map(todoEl => {
+              //   if (todoEl.done === true) {
+              //     doneCount += 1;
+              //   }
+              // });
               processedData.push({
                 fullDate: dateInfo,
                 count: `${doneCount}/${todos.length}`,
