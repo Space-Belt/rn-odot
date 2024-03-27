@@ -19,7 +19,6 @@ const MainStackNavigator = () => {
     const handleBackPress = () => {
       if (navigationRef.getCurrentRoute()?.name === 'TodoListScreen') {
         if (isVisible.isBottomSheetVisible === true) {
-          console.log(isVisible.isBottomSheetVisible);
           setIsVisible({isBottomSheetVisible: false});
         } else if (isVisible.isBottomSheetVisible === false) {
           Alert.alert('잠깐!!', '정말 앱을 종료하시겠어요?', [

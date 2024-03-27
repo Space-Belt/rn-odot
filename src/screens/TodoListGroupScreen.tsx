@@ -14,6 +14,7 @@ import frame from '../assets/images/Frame.png';
 import moment from 'moment';
 import {getStorageData} from '../lib/storage-helper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {TodoItem} from '../types/todos';
 
 export interface Item {
   id: number;
@@ -137,19 +138,13 @@ const TodoListGroupScreen = () => {
             for (const [todo, todos] of Object.entries(tempDays)) {
               let dateInfo = `${tempYear}/${tempMonth}/${todo}`;
               // let doneCount = 0;
+              let aa: TodoItem[] = todos;
 
-              let doneCount = todos.filter(
-                todoEl => todoEl.done === true,
-              ).length;
+              let doneCount = aa.filter(todoEl => todoEl.done === true).length;
 
-              // todos.map(todoEl => {
-              //   if (todoEl.done === true) {
-              //     doneCount += 1;
-              //   }
-              // });
               processedData.push({
                 fullDate: dateInfo,
-                count: `${doneCount}/${todos.length}`,
+                count: `${doneCount}/${aa.length}`,
               });
             }
           }
