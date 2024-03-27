@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import {
-  Image,
   SectionList,
   StyleSheet,
   Text,
@@ -9,10 +8,12 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
-import frame from '../assets/images/Frame.png';
 import moment from 'moment';
+import ReusableHeader from '../components/Headers/ReusableHeader';
 import {getStorageData} from '../lib/storage-helper';
+import {TodoItem} from '../types/todos';
 
 export interface Item {
   id: number;
@@ -54,17 +55,21 @@ const TodoListGroupScreen = () => {
   };
 
   const handleAddTask = () => {
-    navigation.navigate('AddTaskScreen', {
-      selectedYear: year,
-      selectedMonth: month,
-      selectedDate: date,
-    });
+    AsyncStorage.setItem(
+      'date',
+      JSON.stringify({
+        year: year,
+        month: month,
+        day: date,
+      }),
+    );
+    navigation.navigate('AddTaskScreen');
   };
   const [todoData, setTodoData] = useState<TempType[]>([]);
 
   const renderSectionHeader = ({section}: {section: any}) => {
     return (
-      <View>
+      <View style={styles.sectionHeader}>
         <Text>{section.title}</Text>
       </View>
     );
@@ -72,11 +77,15 @@ const TodoListGroupScreen = () => {
 
   const handleListClicked = (date: string) => {
     let [clickedYear, clickedMonth, clickedDate] = date.split('/');
-    navigation.navigate('TodoListScreen', {
-      selectedYear: clickedYear,
-      selectedMonth: clickedMonth,
-      selectedDate: clickedDate,
-    });
+    AsyncStorage.setItem(
+      'date',
+      JSON.stringify({
+        year: clickedYear,
+        month: clickedMonth,
+        day: clickedDate,
+      }),
+    );
+    navigation.navigate('TodoListScreen');
   };
 
   const keyExtractor = (item: TempType) =>
@@ -123,26 +132,24 @@ const TodoListGroupScreen = () => {
       if (results !== null) {
         for (const [tempYear, tempMonths] of Object.entries(results)) {
           for (const [tempMonth, tempDays] of Object.entries(
-            tempMonths as Object,
+            tempMonths as {[key: string]: TempType[]},
           )) {
             for (const [todo, todos] of Object.entries(tempDays)) {
               let dateInfo = `${tempYear}/${tempMonth}/${todo}`;
-              let doneCount = 0;
+              // let doneCount = 0;
+              let aa: TodoItem[] = todos;
 
-              todos.map(todoEl => {
-                if (todoEl.done === true) {
-                  doneCount += 1;
-                }
-              });
+              let doneCount = aa.filter(todoEl => todoEl.done === true).length;
+
               processedData.push({
                 fullDate: dateInfo,
-                count: `${doneCount}/${todos.length}`,
+                count: `${doneCount}/${aa.length}`,
               });
             }
           }
         }
       }
-      setTodoData(processedData);
+      setTodoData(processedData.reverse());
       setSections(createSections(processedData));
     };
     if (isFocused) {
@@ -152,19 +159,11 @@ const TodoListGroupScreen = () => {
 
   return (
     <SafeAreaView style={styles.wrapper}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => handleClick()}>
-          <Image source={frame} style={styles.backImg} />
-        </TouchableOpacity>
-
-        <Text style={styles.headerText}>Todos</Text>
-        <TouchableOpacity onPress={() => handleAddTask()}>
-          <Image
-            source={require('../assets/images/plusButton.png')}
-            style={styles.addBtn}
-          />
-        </TouchableOpacity>
-      </View>
+      <ReusableHeader
+        handleClick={handleClick}
+        handleAddTask={handleAddTask}
+        centerText={'Todos'}
+      />
       <View style={styles.buttonWrapper}>
         {todoData.length > 0 && (
           <SectionList
@@ -244,6 +243,9 @@ const styles = StyleSheet.create({
   dateText: {
     fontWeight: '600',
     fontSize: 16,
+  },
+  sectionHeader: {
+    backgroundColor: '#F2F2F2',
   },
   sectionStyle: {gap: 10},
   countText: {

@@ -1,3 +1,4 @@
+import React, {useEffect, useState} from 'react';
 import {
   Image,
   SafeAreaView,
@@ -8,28 +9,31 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
 
-import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {TodoItem, WholeTodoList} from '../types/todos';
-import MainHeader from '../components/Headers/MainHeader';
-import {getStorageData} from '../lib/storage-helper';
+import {useIsFocused} from '@react-navigation/native';
 import moment from 'moment';
 
-const defaultParams = {
-  selectedYear: '',
-  selectedMonth: '',
-  selectedDate: '',
-};
+import MainHeader from '../components/Headers/MainHeader';
+import NewTaskBottomsheet from '../components/NewTask/NewTaskBottomsheet';
+
+import {getStorageData} from '../lib/storage-helper';
+import {useBottomSheet} from '../recoil/BottomSheetStore';
+import {useToast} from '../recoil/ToastStore';
+import {TodoItem, WholeTodoList} from '../types/todos';
+import ProgressBar from '../components/Todo/Progress/ProgressBar';
+import TodoList from '../components/Todo/List/TodoList';
 
 const TodoListScreen = () => {
-  const navigation = useNavigation();
-  const route = useRoute();
-  const params = route.params;
   const isFocused = useIsFocused();
 
-  const {selectedYear, selectedMonth, selectedDate} = params ?? defaultParams;
+  const {showBottomSheet} = useBottomSheet();
+
+  const {isVisible} = useToast();
+
+  const [thisYear, setThisYear] = useState<string>('');
+  const [thisMonth, setThitMonth] = useState<string>('');
+  const [thisDay, setThisDay] = useState<string>('');
 
   const [odotList, setOdotList] = React.useState<TodoItem[]>([]);
 
@@ -40,16 +44,12 @@ const TodoListScreen = () => {
     let clonedOdotList: TodoItem[] = [...odotList];
     clonedOdotList[i].done = !clonedOdotList[i].done;
     setOdotList(clonedOdotList);
-    clonedFullData[selectedYear][selectedMonth][selectedDate] = clonedOdotList;
+    clonedFullData[thisYear][thisMonth][thisDay] = clonedOdotList;
     AsyncStorage.setItem('todos', JSON.stringify(clonedFullData));
   };
 
   const handlePlusClick = () => {
-    navigation.navigate('AddTaskScreen', {
-      selectedYear,
-      selectedMonth,
-      selectedDate,
-    });
+    showBottomSheet(<NewTaskBottomsheet />);
   };
 
   const renderList = (todo: TodoItem, i: number) => {
@@ -81,70 +81,69 @@ const TodoListScreen = () => {
     );
   };
 
-  useEffect(() => {
-    const getDatas = async () => {
-      let results = await getStorageData('todos');
-      let todoList: TodoItem[] = [];
+  const totalCount = odotList ? odotList.length : 1;
+  const doneCount = odotList ? odotList.filter(list => list.done).length : 1;
+  const percentageWidth = (doneCount / totalCount) * 100;
 
-      if (results === null) {
-        return;
-      }
+  const percentStyle = [styles.percentage, {width: `${percentageWidth}%`}];
 
-      if (results[selectedYear][selectedMonth][selectedDate]) {
-        results[selectedYear][selectedMonth][selectedDate].map(
-          (el: TodoItem) => {
-            todoList.push(el);
-          },
-        );
-      }
+  const getDatas = async (y: string, m: string, d: string) => {
+    let results = await getStorageData('todos');
+    let todoList: TodoItem[] = [];
 
-      setFullData(results);
-      setOdotList(todoList);
-    };
-
-    if (isFocused) {
-      getDatas();
+    if (results === null) {
+      return;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFocused, route.params]);
 
-  const totalCount = odotList.length;
-  const doneCount = odotList.filter(list => list.done).length;
-  const percentage = (doneCount / totalCount) * 100;
+    setFullData(results);
+    setOdotList(results[y][m][d]);
+  };
 
-  const percentStyle = [styles.percentage, {width: `${percentage}%`}];
+  useEffect(() => {
+    const getData = async () => {
+      let results = await getStorageData('date');
+      console.log(results);
+      if (results !== null) {
+        setThisYear(results.year);
+        setThitMonth(results.month);
+        setThisDay(results.day);
+      } else {
+        setThisYear(moment().format('YYYY'));
+        setThitMonth(moment().format('MM'));
+        setThisDay(moment().format('DD'));
+      }
+      getDatas(results.year, results.month, results.day);
+    };
+    if (isFocused || isVisible === true) {
+      getData();
+    }
+  }, [isFocused, isVisible]);
 
   return (
     <View style={styles.wrapper}>
       <SafeAreaView style={{flex: 1}}>
         {/* 앱에서는 네비게이션이함 nav */}
         <MainHeader />
-        <View>
-          {route.params ?? (
-            <Text>{`${selectedYear}/${selectedMonth}/${selectedDate}`}</Text>
-          )}
+        <View style={styles.dateWrapper}>
+          <Text style={styles.dateText}>
+            {thisYear}/{thisMonth}/{thisDay}
+          </Text>
         </View>
-        <View style={styles.textInputArea}>
-          <Text style={styles.progressTextStyle}>progress</Text>
-          <View style={styles.percentageArea}>
-            <View style={styles.emptyPercentage}>
-              <View style={percentStyle} />
-            </View>
-          </View>
-          <View>
-            <Text
-              style={styles.countText}>{`${doneCount} / ${totalCount}`}</Text>
-          </View>
-        </View>
+        <ProgressBar
+          percentageWidth={percentageWidth}
+          doneCount={doneCount}
+          totalCount={totalCount}
+          odotList={odotList}
+        />
+        <TodoList
+          odotList={odotList}
+          fullData={fullData}
+          setOdotList={setOdotList}
+          thisYear={thisYear}
+          thisMonth={thisMonth}
+          thisDay={thisDay}
+        />
 
-        {/* 투두 부분 */}
-        <ScrollView style={styles.scrollViewStyle}>
-          {odotList.length > 0 ? (
-            odotList.map((el: TodoItem, i: number) => renderList(el, i))
-          ) : (
-            <Text>할일을 등록해주세요!</Text>
-          )}
-        </ScrollView>
         <TouchableHighlight
           onPress={handlePlusClick}
           style={styles.plusWrapper}
@@ -167,7 +166,11 @@ const styles = StyleSheet.create({
     height: '100%',
     paddingVertical: 10,
   },
-
+  emptyView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   textInputArea: {
     padding: 15,
     borderRadius: 12,
@@ -226,7 +229,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   todoStyle: {marginLeft: 5},
-  scrollViewStyle: {paddingHorizontal: 25},
+  scrollViewStyle: {flex: 1, paddingHorizontal: 25},
 
   checkImg: {
     width: 25,
@@ -239,5 +242,27 @@ const styles = StyleSheet.create({
     height: 10,
     borderRadius: 10,
     backgroundColor: '#FF7461',
+  },
+  dateWrapper: {
+    paddingHorizontal: 20,
+    fontWeight: '700',
+    alignItems: 'center',
+  },
+  dateText: {
+    width: 110,
+    color: '#333',
+    textAlign: 'center',
+    paddingVertical: 5,
+    marginBottom: 5,
+    fontWeight: '700',
+    elevation: 5,
+    // iOS
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.4,
+    shadowRadius: 3.84,
   },
 });

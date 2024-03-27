@@ -1,33 +1,30 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, {useEffect, useState} from 'react';
 import {
-  Image,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
+  TouchableHighlight,
+  TouchableNativeFeedback,
   View,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-
-import arrow from '../assets/images/arrow.png';
-
+import React from 'react';
+import {useToast} from '../../recoil/ToastStore';
+import {getStorageData} from '../../lib/storage-helper';
 import moment from 'moment';
-import {WholeTodoList} from '../types/todos';
-import AddTaskHeader from '../components/Headers/AddTaskHeader';
-import {getAllKeys, getStorageData} from '../lib/storage-helper';
-import {useToast} from '../recoil/ToastStore';
+import {WholeTodoList} from '../../types/todos';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useBottomSheet} from '../../recoil/BottomSheetStore';
 
-const AddTaskScreen = () => {
+const NewTaskBottomsheet = () => {
   const {showToast} = useToast();
+  const {hideBottomSheet} = useBottomSheet();
 
-  const [thisYear, setThisYear] = useState<string>('');
-  const [thisMonth, setThitMonth] = useState<string>('');
-  const [thisDay, setThisDay] = useState<string>('');
+  const [thisYear, setThisYear] = React.useState<string>('');
+  const [thisMonth, setThitMonth] = React.useState<string>('');
+  const [thisDay, setThisDay] = React.useState<string>('');
 
-  const [todoGroup, setTodoGroup] = useState<WholeTodoList>({});
+  const [todoGroup, setTodoGroup] = React.useState<WholeTodoList>({});
 
-  const [todo, setTodo] = useState<string>('');
+  const [todo, setTodo] = React.useState<string>('');
 
   const addTodoList = () => {
     let clonedData: WholeTodoList = todoGroup;
@@ -52,6 +49,7 @@ const AddTaskScreen = () => {
           AsyncStorage.setItem('todos', JSON.stringify(clonedData));
           setTodo('');
           showToast('오늘할일을 꼭 마무리 하십쇼.', 'success');
+          hideBottomSheet();
         } else {
           clonedData[thisYear][thisMonth][thisDay] = [
             {todo: todo, done: false},
@@ -59,7 +57,10 @@ const AddTaskScreen = () => {
           AsyncStorage.setItem('todos', JSON.stringify(clonedData));
           setTodo('');
           showToast('오늘 첫 할일 등록했습니다. 화이팅!!', 'success');
+          hideBottomSheet();
         }
+      } else {
+        showToast('한글자 이상 부터 등록됩니다.', 'error');
       }
     } else {
       clonedData[thisYear] = {};
@@ -73,6 +74,7 @@ const AddTaskScreen = () => {
       AsyncStorage.setItem('todos', JSON.stringify(clonedData));
       setTodo('');
       showToast('할일 등록 성공!! 오늘도 화이팅', 'success');
+      hideBottomSheet();
     }
   };
 
@@ -80,7 +82,7 @@ const AddTaskScreen = () => {
     setTodo(text);
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     const getData = async () => {
       let results = await getStorageData('todos');
 
@@ -92,11 +94,9 @@ const AddTaskScreen = () => {
     };
 
     getData();
-
-    getAllKeys();
   }, []);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const getData = async () => {
       let results = await getStorageData('date');
 
@@ -115,84 +115,52 @@ const AddTaskScreen = () => {
   }, []);
 
   return (
-    <SafeAreaView style={styles.safeWrapper}>
-      <View style={styles.wrapper}>
-        <AddTaskHeader mb={20} title={'New Task'} />
-
+    <View style={styles.wrapper}>
+      <View>
+        <Text style={styles.topText}>NewTask</Text>
         <TextInput
+          multiline={true}
           value={todo}
-          onChangeText={(text: string) => handleChangeValue(text)}
-          placeholder="tell me what you gonna do today!"
-          style={styles.todoInput}
+          onChangeText={handleChangeValue}
+          placeholder={'tell me what you gonna do today!'}
           autoFocus
         />
-
-        <View style={styles.arrowPhoto}>
-          <Image source={arrow} style={styles.arrowImg} />
-        </View>
-        <TouchableOpacity onPress={addTodoList}>
-          <View style={styles.buttonColor}>
-            <Text style={styles.buttonText}>Add Task</Text>
-          </View>
-        </TouchableOpacity>
       </View>
-    </SafeAreaView>
+      <TouchableHighlight style={styles.addTask} onPress={addTodoList}>
+        <Text style={styles.addText}>Add Task</Text>
+      </TouchableHighlight>
+    </View>
   );
 };
 
-export default AddTaskScreen;
+export default NewTaskBottomsheet;
 
 const styles = StyleSheet.create({
-  safeWrapper: {flex: 1},
   wrapper: {
     flex: 1,
-    position: 'relative',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    justifyContent: 'space-between',
   },
-  textInputArea: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 5,
-  },
-  inputBox: {width: '100%'},
-  todoInput: {
-    width: '100%',
-    borderRadius: 50,
-    height: 40,
-    backgroundColor: '#ffffff',
-    shadowColor: '#0000000D',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 2,
-    shadowRadius: 0,
-    paddingHorizontal: 17,
+  topText: {
+    fontSize: 16,
     fontWeight: '600',
-    elevation: 5,
+    marginBottom: 10,
   },
-  arrowPhoto: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+  taskInput: {
+    textAlignVertical: 'top',
+    borderWidth: 0,
+    fontSize: 14,
+    fontWeight: '600',
   },
-  arrowImg: {
-    width: 100,
-    height: 100,
-  },
-  buttonColor: {
-    height: 45,
+  addTask: {
+    width: '100%',
     backgroundColor: '#FF7461',
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingVertical: 12,
     borderRadius: 12,
   },
-  buttonText: {
-    fontWeight: '600',
+  addText: {
+    textAlign: 'center',
     fontSize: 14,
-    color: '#efefef',
+    fontWeight: '600',
+    color: '#fff',
   },
 });
