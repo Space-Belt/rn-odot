@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import {
-  Image,
   SectionList,
   StyleSheet,
   Text,
@@ -9,11 +8,11 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import {useIsFocused, useNavigation} from '@react-navigation/native';
-import frame from '../assets/images/Frame.png';
-import moment from 'moment';
-import {getStorageData} from '../lib/storage-helper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
+import moment from 'moment';
+import ReusableHeader from '../components/Headers/ReusableHeader';
+import {getStorageData} from '../lib/storage-helper';
 import {TodoItem} from '../types/todos';
 
 export interface Item {
@@ -160,19 +159,11 @@ const TodoListGroupScreen = () => {
 
   return (
     <SafeAreaView style={styles.wrapper}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => handleClick()}>
-          <Image source={frame} style={styles.backImg} />
-        </TouchableOpacity>
-
-        <Text style={styles.headerText}>Todos</Text>
-        <TouchableOpacity onPress={() => handleAddTask()}>
-          <Image
-            source={require('../assets/images/plusButton.png')}
-            style={styles.addBtn}
-          />
-        </TouchableOpacity>
-      </View>
+      <ReusableHeader
+        handleClick={handleClick}
+        handleAddTask={handleAddTask}
+        centerText={'Todos'}
+      />
       <View style={styles.buttonWrapper}>
         {todoData.length > 0 && (
           <SectionList
