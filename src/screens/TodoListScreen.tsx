@@ -22,6 +22,7 @@ import {useBottomSheet} from '../recoil/BottomSheetStore';
 import {useToast} from '../recoil/ToastStore';
 import {TodoItem, WholeTodoList} from '../types/todos';
 import ProgressBar from '../components/Todo/Progress/ProgressBar';
+import TodoList from '../components/Todo/List/TodoList';
 
 const TodoListScreen = () => {
   const isFocused = useIsFocused();
@@ -134,12 +135,15 @@ const TodoListScreen = () => {
           totalCount={totalCount}
           odotList={odotList}
         />
+        <TodoList
+          odotList={odotList}
+          fullData={fullData}
+          setOdotList={setOdotList}
+          thisYear={thisYear}
+          thisMonth={thisMonth}
+          thisDay={thisDay}
+        />
 
-        {/* 투두 부분 */}
-        <ScrollView style={styles.scrollViewStyle}>
-          {odotList?.length > 0 &&
-            odotList.map((el: TodoItem, i: number) => renderList(el, i))}
-        </ScrollView>
         <TouchableHighlight
           onPress={handlePlusClick}
           style={styles.plusWrapper}
