@@ -123,6 +123,7 @@ const NewTaskBottomsheet = () => {
           value={todo}
           onChangeText={handleChangeValue}
           placeholder={'tell me what you gonna do today!'}
+          autoFocus
         />
       </View>
       <TouchableHighlight style={styles.addTask} onPress={addTodoList}>

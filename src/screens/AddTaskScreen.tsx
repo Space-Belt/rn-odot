@@ -124,6 +124,7 @@ const AddTaskScreen = () => {
           onChangeText={(text: string) => handleChangeValue(text)}
           placeholder="tell me what you gonna do today!"
           style={styles.todoInput}
+          autoFocus
         />
 
         <View style={styles.arrowPhoto}>
