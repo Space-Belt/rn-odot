@@ -34,8 +34,8 @@ export const useBottomSheet = () => {
   };
 
   const hideBottomSheet = () => {
-    setContent({content: null});
-    setIsVisible({isBottomSheetVisible: false});
+    setContent(prev => ({...prev, content: null}));
+    setIsVisible(prev => ({...prev, isBottomSheetVisible: false}));
   };
 
   return {

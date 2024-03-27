@@ -7,22 +7,30 @@ import FlatListScreen from '../screens/FlatListScreen';
 import SectionListScreen from '../screens/SectionListScreen';
 import TodoListGroupScreen from '../screens/TodoListGroupScreen';
 import TodoListScreen from '../screens/TodoListScreen';
+import {useRecoilState, useRecoilValue} from 'recoil';
+import {bottomSheetVisibleState} from '../recoil/BottomSheetStore';
 
 const MainStack = createStackNavigator();
 
 const MainStackNavigator = () => {
+  const [isVisible, setIsVisible] = useRecoilState(bottomSheetVisibleState);
   // 안드로이드,
   React.useEffect(() => {
     const handleBackPress = () => {
       if (navigationRef.getCurrentRoute()?.name === 'TodoListScreen') {
-        Alert.alert('잠깐!!', '정말 앱을 종료하시겠어요?', [
-          {
-            text: '취소',
-            onPress: () => null,
-            style: 'cancel',
-          },
-          {text: '나가기', onPress: () => BackHandler.exitApp()},
-        ]);
+        if (isVisible.isBottomSheetVisible === true) {
+          console.log(isVisible.isBottomSheetVisible);
+          setIsVisible({isBottomSheetVisible: false});
+        } else if (isVisible.isBottomSheetVisible === false) {
+          Alert.alert('잠깐!!', '정말 앱을 종료하시겠어요?', [
+            {
+              text: '취소',
+              onPress: () => null,
+              style: 'cancel',
+            },
+            {text: '나가기', onPress: () => BackHandler.exitApp()},
+          ]);
+        }
       } else {
         navigationRef.goBack();
       }
@@ -35,7 +43,7 @@ const MainStackNavigator = () => {
     return BackHandler.removeEventListener('hardwareBackPress', () =>
       handleBackPress(),
     );
-  }, []);
+  }, [isVisible.isBottomSheetVisible]);
 
   return (
     <MainStack.Navigator
