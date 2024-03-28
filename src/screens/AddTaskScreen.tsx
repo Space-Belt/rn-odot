@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect, useState} from 'react';
 import {
   Image,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -13,10 +14,10 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import arrow from '../assets/images/arrow.png';
 
 import moment from 'moment';
-import {WholeTodoList} from '../types/todos';
 import AddTaskHeader from '../components/Headers/AddTaskHeader';
 import {getAllKeys, getStorageData} from '../lib/storage-helper';
 import {useToast} from '../recoil/ToastStore';
+import {WholeTodoList} from '../types/todos';
 
 const AddTaskScreen = () => {
   const {showToast} = useToast();
@@ -125,6 +126,7 @@ const AddTaskScreen = () => {
           placeholder="tell me what you gonna do today!"
           style={styles.todoInput}
           autoFocus
+          textAlignVertical={'center'}
         />
 
         <View style={styles.arrowPhoto}>
@@ -161,7 +163,7 @@ const styles = StyleSheet.create({
   todoInput: {
     width: '100%',
     borderRadius: 50,
-    height: 40,
+    height: Platform.OS === 'android' ? 50 : 40,
     backgroundColor: '#ffffff',
     shadowColor: '#0000000D',
     shadowOffset: {

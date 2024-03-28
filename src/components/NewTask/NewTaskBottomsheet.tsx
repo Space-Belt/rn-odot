@@ -1,18 +1,18 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import moment from 'moment';
+import React from 'react';
 import {
+  Platform,
   StyleSheet,
   Text,
   TextInput,
   TouchableHighlight,
-  TouchableNativeFeedback,
   View,
 } from 'react-native';
-import React from 'react';
-import {useToast} from '../../recoil/ToastStore';
 import {getStorageData} from '../../lib/storage-helper';
-import moment from 'moment';
-import {WholeTodoList} from '../../types/todos';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useBottomSheet} from '../../recoil/BottomSheetStore';
+import {useToast} from '../../recoil/ToastStore';
+import {WholeTodoList} from '../../types/todos';
 
 const NewTaskBottomsheet = () => {
   const {showToast} = useToast();
@@ -124,6 +124,7 @@ const NewTaskBottomsheet = () => {
           onChangeText={handleChangeValue}
           placeholder={'tell me what you gonna do today!'}
           autoFocus
+          textAlignVertical={Platform.OS === 'android' ? 'top' : 'center'}
         />
       </View>
       <TouchableHighlight style={styles.addTask} onPress={addTodoList}>
