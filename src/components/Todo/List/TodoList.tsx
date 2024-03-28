@@ -1,3 +1,5 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, {Dispatch, SetStateAction} from 'react';
 import {
   Image,
   ScrollView,
@@ -6,9 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {Dispatch, SetStateAction} from 'react';
 import {TodoItem, WholeTodoList} from '../../../types/todos';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type props = {
   odotList: TodoItem[];

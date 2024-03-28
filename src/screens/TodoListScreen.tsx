@@ -2,27 +2,24 @@ import React, {useEffect, useState} from 'react';
 import {
   Image,
   SafeAreaView,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableHighlight,
-  TouchableOpacity,
   View,
 } from 'react-native';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useIsFocused} from '@react-navigation/native';
 import moment from 'moment';
 
 import MainHeader from '../components/Headers/MainHeader';
 import NewTaskBottomsheet from '../components/NewTask/NewTaskBottomsheet';
 
+import TodoList from '../components/Todo/List/TodoList';
+import ProgressBar from '../components/Todo/Progress/ProgressBar';
 import {getStorageData} from '../lib/storage-helper';
 import {useBottomSheet} from '../recoil/BottomSheetStore';
 import {useToast} from '../recoil/ToastStore';
 import {TodoItem, WholeTodoList} from '../types/todos';
-import ProgressBar from '../components/Todo/Progress/ProgressBar';
-import TodoList from '../components/Todo/List/TodoList';
 
 const TodoListScreen = () => {
   const isFocused = useIsFocused();
@@ -39,57 +36,16 @@ const TodoListScreen = () => {
 
   const [fullData, setFullData] = React.useState<WholeTodoList>({});
 
-  const handleCheckTodoList = (i: number) => {
-    let clonedFullData: WholeTodoList = fullData;
-    let clonedOdotList: TodoItem[] = [...odotList];
-    clonedOdotList[i].done = !clonedOdotList[i].done;
-    setOdotList(clonedOdotList);
-    clonedFullData[thisYear][thisMonth][thisDay] = clonedOdotList;
-    AsyncStorage.setItem('todos', JSON.stringify(clonedFullData));
-  };
-
   const handlePlusClick = () => {
     showBottomSheet(<NewTaskBottomsheet />);
-  };
-
-  const renderList = (todo: TodoItem, i: number) => {
-    return (
-      <TouchableOpacity
-        onPress={() => handleCheckTodoList(i)}
-        key={`todos-${i}`}>
-        <View
-          style={[
-            styles.todo,
-            odotList.length - 1 === i ? {marginBottom: 10} : {},
-          ]}>
-          {todo.done !== undefined && todo.done !== false ? (
-            <Image
-              style={styles.checkImg}
-              source={require('../assets/images/checked.png')}
-            />
-          ) : (
-            <Image
-              style={styles.checkImg}
-              source={require('../assets/images/unchecked.png')}
-            />
-          )}
-          <View style={styles.todoStyle}>
-            <Text>{todo.todo}</Text>
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
   };
 
   const totalCount = odotList ? odotList.length : 1;
   const doneCount = odotList ? odotList.filter(list => list.done).length : 1;
   const percentageWidth = (doneCount / totalCount) * 100;
 
-  const percentStyle = [styles.percentage, {width: `${percentageWidth}%`}];
-
   const getDatas = async (y: string, m: string, d: string) => {
     let results = await getStorageData('todos');
-    let todoList: TodoItem[] = [];
 
     if (results === null) {
       return;
@@ -135,15 +91,16 @@ const TodoListScreen = () => {
           totalCount={totalCount}
           odotList={odotList}
         />
-        <TodoList
-          odotList={odotList}
-          fullData={fullData}
-          setOdotList={setOdotList}
-          thisYear={thisYear}
-          thisMonth={thisMonth}
-          thisDay={thisDay}
-        />
-
+        {odotList !== undefined && (
+          <TodoList
+            odotList={odotList}
+            fullData={fullData}
+            setOdotList={setOdotList}
+            thisYear={thisYear}
+            thisMonth={thisMonth}
+            thisDay={thisDay}
+          />
+        )}
         <TouchableHighlight
           onPress={handlePlusClick}
           style={styles.plusWrapper}

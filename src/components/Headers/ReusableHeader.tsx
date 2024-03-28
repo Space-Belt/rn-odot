@@ -41,7 +41,7 @@ const ReusableHeader = ({
       ) : rightBtnElement !== undefined ? (
         rightBtnElement
       ) : (
-        <View></View>
+        <View />
       )}
     </View>
   );
