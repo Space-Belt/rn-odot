@@ -92,13 +92,14 @@ const TodoListGroupScreen = () => {
     `section-list-item-=${item.fullDate}`;
   const renderItem = ({item}: {item: TempType}) => {
     return (
-      <TouchableOpacity onPress={() => handleListClicked(item.fullDate)}>
-        <View style={styles.listWrapper}>
-          <Text style={styles.dateText}>
-            {item.fullDate.slice(8, 10)}일 Todos
-          </Text>
-          <Text style={styles.countText}>{item.count}</Text>
-        </View>
+      <TouchableOpacity
+        onPress={() => handleListClicked(item.fullDate)}
+        activeOpacity={0.7}
+        style={styles.listWrapper}>
+        <Text style={styles.dateText}>
+          {item.fullDate.slice(8, 10)}일 Todos
+        </Text>
+        <Text style={styles.countText}>{item.count}</Text>
       </TouchableOpacity>
     );
   };
@@ -238,7 +239,7 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 0},
     shadowOpacity: 0.2,
     shadowRadius: 1,
-    elevation: 5,
+    elevation: 1,
   },
   dateText: {
     fontWeight: '600',
