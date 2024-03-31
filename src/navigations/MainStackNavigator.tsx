@@ -1,14 +1,14 @@
 import {createStackNavigator} from '@react-navigation/stack';
 import React from 'react';
 import {Alert, BackHandler} from 'react-native';
+import {useRecoilState} from 'recoil';
 import {navigationRef} from '../lib/navigation';
-import AddTaskScreen from '../screens/AddTaskScreen';
+import {bottomSheetVisibleState} from '../recoil/BottomSheetStore';
 import FlatListScreen from '../screens/FlatListScreen';
+import ListSwipeScreen from '../screens/ListSwipeScreen';
 import SectionListScreen from '../screens/SectionListScreen';
 import TodoListGroupScreen from '../screens/TodoListGroupScreen';
 import TodoListScreen from '../screens/TodoListScreen';
-import {useRecoilState, useRecoilValue} from 'recoil';
-import {bottomSheetVisibleState} from '../recoil/BottomSheetStore';
 
 const MainStack = createStackNavigator();
 
@@ -53,7 +53,8 @@ const MainStackNavigator = () => {
         name="TodoListGroupScreen"
         component={TodoListGroupScreen}
       />
-      <MainStack.Screen name="AddTaskScreen" component={AddTaskScreen} />
+      {/* <MainStack.Screen name="AddTaskScreen" component={AddTaskScreen} /> */}
+      <MainStack.Screen name="ListSwipeScreen" component={ListSwipeScreen} />
       <MainStack.Screen name="FlatListScreen" component={FlatListScreen} />
       <MainStack.Screen
         name="SectionListScreen"
