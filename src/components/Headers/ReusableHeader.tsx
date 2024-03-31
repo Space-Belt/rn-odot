@@ -8,6 +8,7 @@ type props = {
   rightBtnElement?: React.ReactElement;
   leftBtnElement?: React.ReactElement;
   centerText: string;
+  paddingHorizontal?: number;
 };
 
 const ReusableHeader = ({
@@ -16,9 +17,16 @@ const ReusableHeader = ({
   rightBtnElement,
   leftBtnElement,
   centerText,
+  paddingHorizontal,
 }: props) => {
   return (
-    <View style={styles.header}>
+    <View
+      style={[
+        styles.header,
+        paddingHorizontal !== undefined
+          ? {paddingHorizontal: paddingHorizontal}
+          : {},
+      ]}>
       {handleClick !== undefined ? (
         <TouchableOpacity
           onPress={handleClick !== undefined ? handleClick : () => {}}>
