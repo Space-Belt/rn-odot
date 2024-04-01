@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
 import moment from 'moment';
 import React, {useEffect, useState} from 'react';
@@ -12,6 +11,8 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import ReusableHeader from '../components/Headers/ReusableHeader';
 import {getStorageData} from '../lib/storage-helper';
+import {useTodoList} from '../recoil/Todo';
+import {ITodoItem} from '../types/todos';
 
 export interface Item {
   id: number;
@@ -19,35 +20,21 @@ export interface Item {
   date: string;
 }
 
-export interface ItemType {
+export interface IItemType {
   count: string;
   fullDate: string;
+  todos: ITodoItem[];
 }
 
 export interface SectionType {
   title: string;
-  data: ItemType[];
+  data: IItemType[];
 }
-
-// const DUMMY_SECTION_DATA: SectionType[] = [
-//   {title: '2024/03/31', data: [{count: '10', fullDate: 'asdfasdf'}]},
-//   {title: '2024/04/01', data: [{count: '10', fullDate: 'asdfasdf123'}]},
-//   {title: '2024/04/32', data: [{count: '10', fullDate: 'asdfasdf456'}]},
-//   {
-//     title: '2024/04/32',
-//     data: [
-//       {count: '10', fullDate: 'asdfasdf456'},
-//       {count: '10', fullDate: '미ㅏ얼먇'},
-//       {count: '10', fullDate: 'asldifjawlidfjv'},
-//       {count: '10', fullDate: 'eibvalsoiem'},
-//       {count: '10', fullDate: 'asldifjawlidawdf'},
-//       {count: '10', fullDate: 'a9188vh8d'},
-//     ],
-//   },
-// ];
 
 const TodoListGroupScreen = () => {
   const navigation = useNavigation();
+
+  const {setTodos} = useTodoList();
 
   const today = moment().format('YYYY/MM/DD');
   const [year, month, date] = today.split('/');
@@ -59,15 +46,6 @@ const TodoListGroupScreen = () => {
   };
 
   const handleAddTask = () => {
-    // AsyncStorage.setItem(
-    //   'date',
-    //   JSON.stringify({
-    //     year: year,
-    //     month: month,
-    //     day: date,
-    //   }),
-    // );
-    // navigation.navigate('AddTaskScreen');
     navigation.navigate('ListSwipeScreen');
   };
 
@@ -79,24 +57,15 @@ const TodoListGroupScreen = () => {
     );
   };
 
-  const handleListClicked = ({item}: {item: ItemType}) => {
-    let [clickedYear, clickedMonth, clickedDate] = date.split('/');
-    AsyncStorage.setItem(
-      'date',
-      JSON.stringify({
-        year: clickedYear,
-        month: clickedMonth,
-        day: clickedDate,
-      }),
-    );
-
+  const handleListClicked = (item: IItemType) => {
+    setTodos(item.fullDate, item.todos);
     navigation.navigate('TodoListScreen');
   };
 
-  const keyExtractor = (item: ItemType) =>
+  const keyExtractor = (item: IItemType) =>
     `section-list-item-=${item.fullDate}`;
 
-  const renderItem = ({item}: {item: ItemType}) => {
+  const renderItem = ({item}: {item: IItemType}) => {
     return (
       <TouchableOpacity
         onPress={() => handleListClicked(item)}
@@ -110,14 +79,12 @@ const TodoListGroupScreen = () => {
     );
   };
 
-  const createSections = (data: ItemType[]): SectionType[] => {
-    const nameObject: Record<string, ItemType[]> = {};
-    console.log(data);
+  const createSections = (datas: IItemType[]): SectionType[] => {
+    const nameObject: Record<string, IItemType[]> = {};
 
-    data.forEach(item => {
+    datas.forEach(item => {
       const firstLetter = item.fullDate.slice(0, 7);
       console.log(firstLetter);
-      // if (!firstLetter) return;
 
       if (!nameObject[firstLetter]) {
         nameObject[firstLetter] = [item];
@@ -154,15 +121,14 @@ const TodoListGroupScreen = () => {
             processedData.push({
               fullDate: dateInfo,
               count: `${doneCount}/${tempData.length}`,
+              todos: tempData,
             });
           }
         }
       }
-      console.log('여기');
-      console.log(processedData.reverse());
     }
 
-    setSections(createSections(processedData));
+    setSections(createSections(processedData.reverse()));
   }, []);
 
   useEffect(() => {

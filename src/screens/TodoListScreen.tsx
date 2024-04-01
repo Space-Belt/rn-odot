@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {
   Image,
   SafeAreaView,
@@ -9,17 +9,18 @@ import {
 } from 'react-native';
 
 import {useIsFocused} from '@react-navigation/native';
-import moment from 'moment';
 
 import MainHeader from '../components/Headers/MainHeader';
 import NewTaskBottomsheet from '../components/NewTask/NewTaskBottomsheet';
 
+import {useRecoilValue} from 'recoil';
 import TodoList from '../components/Todo/List/TodoList';
 import ProgressBar from '../components/Todo/Progress/ProgressBar';
 import {getStorageData} from '../lib/storage-helper';
 import {useBottomSheet} from '../recoil/BottomSheetStore';
 import {useToast} from '../recoil/ToastStore';
-import {IITodoItem, IWholeTodoList} from '../types/todos';
+import {todoList} from '../recoil/Todo';
+import {IWholeTodoList} from '../types/todos';
 
 const TodoListScreen = () => {
   const isFocused = useIsFocused();
@@ -27,12 +28,9 @@ const TodoListScreen = () => {
   const {showBottomSheet} = useBottomSheet();
 
   const {isVisible} = useToast();
+  const todoItem = useRecoilValue(todoList);
 
-  const [thisYear, setThisYear] = useState<string>('');
-  const [thisMonth, setThitMonth] = useState<string>('');
-  const [thisDay, setThisDay] = useState<string>('');
-
-  const [odotList, setOdotList] = React.useState<IITodoItem[]>([]);
+  const [thisYear, thisMonth, thisDay] = todoItem.fullDate.split('/');
 
   const [fullData, setFullData] = React.useState<IWholeTodoList>({});
 
@@ -40,11 +38,13 @@ const TodoListScreen = () => {
     showBottomSheet(<NewTaskBottomsheet />);
   };
 
-  const totalCount = odotList ? odotList.length : 1;
-  const doneCount = odotList ? odotList.filter(list => list.done).length : 1;
+  const totalCount = todoItem ? todoItem.todos.length : 1;
+  const doneCount = todoItem
+    ? todoItem.todos.filter(list => list.done).length
+    : 1;
   const percentageWidth = (doneCount / totalCount) * 100;
 
-  const getDatas = async (y: string, m: string, d: string) => {
+  const getDatas = async () => {
     let results = await getStorageData('todos');
 
     if (results === null) {
@@ -52,26 +52,11 @@ const TodoListScreen = () => {
     }
 
     setFullData(results);
-    setOdotList(results[y][m][d]);
   };
 
   useEffect(() => {
-    const getData = async () => {
-      let results = await getStorageData('date');
-      console.log(results);
-      if (results !== null) {
-        setThisYear(results.year);
-        setThitMonth(results.month);
-        setThisDay(results.day);
-      } else {
-        setThisYear(moment().format('YYYY'));
-        setThitMonth(moment().format('MM'));
-        setThisDay(moment().format('DD'));
-      }
-      getDatas(results.year, results.month, results.day);
-    };
     if (isFocused || isVisible === true) {
-      getData();
+      getDatas();
     }
   }, [isFocused, isVisible]);
 
@@ -81,26 +66,21 @@ const TodoListScreen = () => {
         {/* 앱에서는 네비게이션이함 nav */}
         <MainHeader />
         <View style={styles.dateWrapper}>
-          <Text style={styles.dateText}>
-            {thisYear}/{thisMonth}/{thisDay}
-          </Text>
+          <Text style={styles.dateText}>{todoItem.fullDate}</Text>
         </View>
         <ProgressBar
           percentageWidth={percentageWidth}
           doneCount={doneCount}
           totalCount={totalCount}
-          odotList={odotList}
+          odotList={todoItem.todos}
         />
-        {odotList !== undefined && (
-          <TodoList
-            odotList={odotList}
-            fullData={fullData}
-            setOdotList={setOdotList}
-            thisYear={thisYear}
-            thisMonth={thisMonth}
-            thisDay={thisDay}
-          />
-        )}
+        <TodoList
+          odotList={todoItem.todos}
+          fullData={fullData}
+          thisYear={thisYear}
+          thisMonth={thisMonth}
+          thisDay={thisDay}
+        />
         <TouchableHighlight
           onPress={handlePlusClick}
           style={styles.plusWrapper}
