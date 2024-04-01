@@ -53,8 +53,8 @@ const MainStackNavigator = () => {
         name="TodoListGroupScreen"
         component={TodoListGroupScreen}
       />
-      {/* <MainStack.Screen name="AddTaskScreen" component={AddTaskScreen} /> */}
       <MainStack.Screen name="ListSwipeScreen" component={ListSwipeScreen} />
+      {/* <MainStack.Screen name="AddTaskScreen" component={AddTaskScreen} /> */}
       <MainStack.Screen name="FlatListScreen" component={FlatListScreen} />
       <MainStack.Screen
         name="SectionListScreen"

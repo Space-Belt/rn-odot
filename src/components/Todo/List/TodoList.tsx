@@ -8,12 +8,12 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {TodoItem, WholeTodoList} from '../../../types/todos';
+import {ITodoItem, IWholeTodoList} from '../../../types/todos';
 
 type props = {
-  odotList: TodoItem[];
-  setOdotList: Dispatch<SetStateAction<TodoItem[]>>;
-  fullData: WholeTodoList;
+  odotList: ITodoItem[];
+  setOdotList: Dispatch<SetStateAction<ITodoItem[]>>;
+  fullData: IWholeTodoList;
   thisYear: string;
   thisMonth: string;
   thisDay: string;
@@ -28,8 +28,8 @@ const TodoList = ({
   thisDay,
 }: props) => {
   const handleCheckTodoList = (i: number) => {
-    let clonedFullData: WholeTodoList = fullData;
-    let clonedOdotList: TodoItem[] = [...odotList];
+    let clonedFullData: IWholeTodoList = fullData;
+    let clonedOdotList: ITodoItem[] = [...odotList];
     clonedOdotList[i].done = !clonedOdotList[i].done;
     setOdotList(clonedOdotList);
     clonedFullData[thisYear][thisMonth][thisDay] = clonedOdotList;

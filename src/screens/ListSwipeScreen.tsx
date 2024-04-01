@@ -67,7 +67,7 @@ const ListSwipeScreen = () => {
     dragValue: AnimatedInterpolation,
     id: number,
   ) => {
-    console.log(progress, dragValue);
+    // console.log(progress, dragValue);
     const opacity = dragValue.interpolate({
       inputRange: [-100, 0],
       outputRange: [1, 0],
@@ -105,6 +105,27 @@ const ListSwipeScreen = () => {
       </Swipeable>
     );
   };
+  // const solution = (n: number) => {
+  //   var answer = 0;
+  //   let even = n % 2 === 0 ? true : false;
+  //   if (even) {
+  //     for (let i = 2; i <= n; i + 2) {
+  //       if (n % i === 0) {
+  //         answer += i * i;
+  //       }
+  //     }
+  //   } else {
+  //     for (let i = 1; i <= n; i + 2) {
+  //       answer += i;
+  //     }
+  //   }
+  //   console.log(answer);
+  //   return answer;
+  // };
+  // React.useEffect(() => {
+  //   console.log('dfdfdf');
+  //   solution(7);
+  // }, []);
 
   return (
     <SafeAreaView style={styles.safeWrapper}>
@@ -114,7 +135,7 @@ const ListSwipeScreen = () => {
           centerText={''}
           paddingHorizontal={20}
         />
-        <Text style={styles.title}>ChatRooms</Text>
+        <Text style={styles.title}>ChatRoomsssss</Text>
         <FlatList data={mock} renderItem={renderItem} />
       </View>
     </SafeAreaView>

@@ -12,7 +12,7 @@ import {
 import {getStorageData} from '../../lib/storage-helper';
 import {useBottomSheet} from '../../recoil/BottomSheetStore';
 import {useToast} from '../../recoil/ToastStore';
-import {WholeTodoList} from '../../types/todos';
+import {IWholeTodoList} from '../../types/todos';
 
 const NewTaskBottomsheet = () => {
   const {showToast} = useToast();
@@ -22,12 +22,12 @@ const NewTaskBottomsheet = () => {
   const [thisMonth, setThitMonth] = React.useState<string>('');
   const [thisDay, setThisDay] = React.useState<string>('');
 
-  const [todoGroup, setTodoGroup] = React.useState<WholeTodoList>({});
+  const [todoGroup, setTodoGroup] = React.useState<IWholeTodoList>({});
 
   const [todo, setTodo] = React.useState<string>('');
 
   const addTodoList = () => {
-    let clonedData: WholeTodoList = todoGroup;
+    let clonedData: IWholeTodoList = todoGroup;
 
     if (Object.keys(clonedData).length !== 0) {
       if (todo.length > 0) {

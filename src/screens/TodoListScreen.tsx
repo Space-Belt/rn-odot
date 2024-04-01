@@ -19,7 +19,7 @@ import ProgressBar from '../components/Todo/Progress/ProgressBar';
 import {getStorageData} from '../lib/storage-helper';
 import {useBottomSheet} from '../recoil/BottomSheetStore';
 import {useToast} from '../recoil/ToastStore';
-import {TodoItem, WholeTodoList} from '../types/todos';
+import {IITodoItem, IWholeTodoList} from '../types/todos';
 
 const TodoListScreen = () => {
   const isFocused = useIsFocused();
@@ -32,9 +32,9 @@ const TodoListScreen = () => {
   const [thisMonth, setThitMonth] = useState<string>('');
   const [thisDay, setThisDay] = useState<string>('');
 
-  const [odotList, setOdotList] = React.useState<TodoItem[]>([]);
+  const [odotList, setOdotList] = React.useState<IITodoItem[]>([]);
 
-  const [fullData, setFullData] = React.useState<WholeTodoList>({});
+  const [fullData, setFullData] = React.useState<IWholeTodoList>({});
 
   const handlePlusClick = () => {
     showBottomSheet(<NewTaskBottomsheet />);

@@ -17,7 +17,7 @@ import moment from 'moment';
 import AddTaskHeader from '../components/Headers/AddTaskHeader';
 import {getAllKeys, getStorageData} from '../lib/storage-helper';
 import {useToast} from '../recoil/ToastStore';
-import {WholeTodoList} from '../types/todos';
+import {IWholeTodoList} from '../types/todos';
 
 const AddTaskScreen = () => {
   const {showToast} = useToast();
@@ -26,12 +26,12 @@ const AddTaskScreen = () => {
   const [thisMonth, setThitMonth] = useState<string>('');
   const [thisDay, setThisDay] = useState<string>('');
 
-  const [todoGroup, setTodoGroup] = useState<WholeTodoList>({});
+  const [todoGroup, setTodoGroup] = useState<IWholeTodoList>({});
 
   const [todo, setTodo] = useState<string>('');
 
   const addTodoList = () => {
-    let clonedData: WholeTodoList = todoGroup;
+    let clonedData: IWholeTodoList = todoGroup;
 
     if (Object.keys(clonedData).length !== 0) {
       if (todo.length > 0) {
