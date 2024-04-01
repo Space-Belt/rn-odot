@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   BackHandler,
   Dimensions,
@@ -5,13 +6,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import React from 'react';
-import {useRecoilState, useRecoilValue} from 'recoil';
-import {
-  bottomSheetContent,
-  bottomSheetVisibleState,
-  useBottomSheet,
-} from '../../recoil/BottomSheetStore';
+import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Animated, {
   FadeIn,
   FadeOut,
@@ -21,8 +16,13 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import {getStatusBarHeight} from 'react-native-safearea-height';
+import {useRecoilState, useRecoilValue} from 'recoil';
+import {
+  bottomSheetContent,
+  bottomSheetVisibleState,
+  useBottomSheet,
+} from '../../recoil/BottomSheetStore';
 
 const screenHeight = Dimensions.get('window').height;
 const bottomSheetHeight = screenHeight * 0.4;

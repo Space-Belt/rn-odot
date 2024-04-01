@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {Gesture} from 'react-native-gesture-handler';
 import {useTodoList} from '../../../recoil/Todo';
 import {ITodoItem, IWholeTodoList} from '../../../types/todos';
 
@@ -40,9 +41,18 @@ const TodoList = ({
     AsyncStorage.setItem('todos', JSON.stringify(clonedFullData));
   };
 
+  const swipeGestureEvent = Gesture.Pan()
+    .onStart(() => {
+      console.log('dfdf');
+    })
+    .onUpdate(event => {
+      console.log(event.translationX);
+    });
+
   return (
     <ScrollView style={styles.scrollViewStyle}>
       {odotList.map((todo, i) => (
+        // <GestureDetector gesture={swipeGestureEvent}>
         <TouchableOpacity
           onPress={() => handleCheckTodoList(i)}
           key={`todos-${i}`}>
@@ -67,6 +77,7 @@ const TodoList = ({
             </View>
           </View>
         </TouchableOpacity>
+        // </GestureDetector>
       ))}
     </ScrollView>
   );

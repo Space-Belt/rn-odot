@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import ReusableHeader from '../components/Headers/ReusableHeader';
 import {getStorageData} from '../lib/storage-helper';
@@ -58,20 +59,59 @@ const TodoListGroupScreen = () => {
     navigation.navigate('TodoListScreen');
   };
 
+  // const panGestureEvent = Gesture.Pan()
+  //   .onStart(() => {
+  //     console.log('dfdf');
+  //   })
+  //   .onUpdate(event => {
+  //     console.log(event.translationX);
+  //   });
+
   const keyExtractor = (item: IItemType) =>
     `section-list-item-=${item.fullDate}`;
 
   const renderItem = ({item}: {item: IItemType}) => {
+    const panGestureEvent = Gesture.Pan()
+      .onStart(() => {
+        console.log('dfdf');
+      })
+      .onUpdate(event => {
+        console.log(event.translationX);
+      });
     return (
-      <TouchableOpacity
-        onPress={() => handleListClicked(item)}
-        activeOpacity={0.7}
-        style={styles.listWrapper}>
-        <Text style={styles.dateText}>
-          {item.fullDate.slice(8, 10)}일 Todos
-        </Text>
-        <Text style={styles.countText}>{item.count}</Text>
-      </TouchableOpacity>
+      <GestureDetector
+        // gesture={Gesture.Pan()
+        //   .onStart(() => {
+        //     console.log('dfdf');
+        //   })
+        //   .onUpdate(event => {
+        //     console.log(event.translationX);
+        //   })}
+        gesture={panGestureEvent}>
+        <View>
+          <TouchableOpacity
+            onPress={() => handleListClicked(item)}
+            activeOpacity={0.7}
+            style={styles.listWrapper}>
+            <Text style={styles.dateText}>
+              {item.fullDate.slice(8, 10)}일 Todos
+            </Text>
+            <Text style={styles.countText}>{item.count}</Text>
+          </TouchableOpacity>
+          <View
+            style={{
+              position: 'absolute',
+              width: 100,
+              height: '100%',
+              alignItems: 'center',
+              justifyContent: 'center',
+              right: 0,
+              opacity: 0,
+            }}>
+            <Text>dfdf</Text>
+          </View>
+        </View>
+      </GestureDetector>
     );
   };
 
