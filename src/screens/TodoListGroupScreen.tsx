@@ -1,5 +1,4 @@
 import {useNavigation} from '@react-navigation/native';
-import moment from 'moment';
 import React, {useEffect, useState} from 'react';
 import {
   SectionList,
@@ -35,9 +34,6 @@ const TodoListGroupScreen = () => {
   const navigation = useNavigation();
 
   const {setTodos} = useTodoList();
-
-  const today = moment().format('YYYY/MM/DD');
-  const [year, month, date] = today.split('/');
 
   const [sections, setSections] = useState<SectionType[]>([]);
 
