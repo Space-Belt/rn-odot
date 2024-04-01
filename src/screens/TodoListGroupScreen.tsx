@@ -1,3 +1,6 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useNavigation} from '@react-navigation/native';
+import moment from 'moment';
 import React, {useEffect, useState} from 'react';
 import {
   SectionList,
@@ -7,13 +10,8 @@ import {
   View,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useIsFocused, useNavigation} from '@react-navigation/native';
-import moment from 'moment';
 import ReusableHeader from '../components/Headers/ReusableHeader';
 import {getStorageData} from '../lib/storage-helper';
-import {TodoItem} from '../types/todos';
 
 export interface Item {
   id: number;
@@ -22,8 +20,8 @@ export interface Item {
 }
 
 export interface ItemType {
-  id: string;
-  name: string;
+  count: string;
+  fullDate: string;
 }
 
 export interface SectionType {
@@ -31,41 +29,47 @@ export interface SectionType {
   data: ItemType[];
 }
 
-export interface TempType {
-  count: string;
-  fullDate: string;
-}
-
-export interface TempGroupType {
-  title: string;
-  data: TempType[];
-}
+// const DUMMY_SECTION_DATA: SectionType[] = [
+//   {title: '2024/03/31', data: [{count: '10', fullDate: 'asdfasdf'}]},
+//   {title: '2024/04/01', data: [{count: '10', fullDate: 'asdfasdf123'}]},
+//   {title: '2024/04/32', data: [{count: '10', fullDate: 'asdfasdf456'}]},
+//   {
+//     title: '2024/04/32',
+//     data: [
+//       {count: '10', fullDate: 'asdfasdf456'},
+//       {count: '10', fullDate: '미ㅏ얼먇'},
+//       {count: '10', fullDate: 'asldifjawlidfjv'},
+//       {count: '10', fullDate: 'eibvalsoiem'},
+//       {count: '10', fullDate: 'asldifjawlidawdf'},
+//       {count: '10', fullDate: 'a9188vh8d'},
+//     ],
+//   },
+// ];
 
 const TodoListGroupScreen = () => {
   const navigation = useNavigation();
-  const isFocused = useIsFocused();
 
   const today = moment().format('YYYY/MM/DD');
   const [year, month, date] = today.split('/');
 
-  const [sections, setSections] = useState<TempGroupType[]>([]);
+  const [sections, setSections] = useState<SectionType[]>([]);
 
   const handleClick = () => {
     navigation.goBack();
   };
 
   const handleAddTask = () => {
-    AsyncStorage.setItem(
-      'date',
-      JSON.stringify({
-        year: year,
-        month: month,
-        day: date,
-      }),
-    );
-    navigation.navigate('AddTaskScreen');
+    // AsyncStorage.setItem(
+    //   'date',
+    //   JSON.stringify({
+    //     year: year,
+    //     month: month,
+    //     day: date,
+    //   }),
+    // );
+    // navigation.navigate('AddTaskScreen');
+    navigation.navigate('ListSwipeScreen');
   };
-  const [todoData, setTodoData] = useState<TempType[]>([]);
 
   const renderSectionHeader = ({section}: {section: any}) => {
     return (
@@ -75,7 +79,7 @@ const TodoListGroupScreen = () => {
     );
   };
 
-  const handleListClicked = (date: string) => {
+  const handleListClicked = ({item}: {item: ItemType}) => {
     let [clickedYear, clickedMonth, clickedDate] = date.split('/');
     AsyncStorage.setItem(
       'date',
@@ -85,15 +89,17 @@ const TodoListGroupScreen = () => {
         day: clickedDate,
       }),
     );
+
     navigation.navigate('TodoListScreen');
   };
 
-  const keyExtractor = (item: TempType) =>
+  const keyExtractor = (item: ItemType) =>
     `section-list-item-=${item.fullDate}`;
-  const renderItem = ({item}: {item: TempType}) => {
+
+  const renderItem = ({item}: {item: ItemType}) => {
     return (
       <TouchableOpacity
-        onPress={() => handleListClicked(item.fullDate)}
+        onPress={() => handleListClicked(item)}
         activeOpacity={0.7}
         style={styles.listWrapper}>
         <Text style={styles.dateText}>
@@ -104,12 +110,14 @@ const TodoListGroupScreen = () => {
     );
   };
 
-  const createSections = (data: TempType[]): TempGroupType[] => {
-    const nameObject: Record<string, TempType[]> = {};
+  const createSections = (data: ItemType[]): SectionType[] => {
+    const nameObject: Record<string, ItemType[]> = {};
+    console.log(data);
+
     data.forEach(item => {
       const firstLetter = item.fullDate.slice(0, 7);
-
-      if (!firstLetter) return;
+      console.log(firstLetter);
+      // if (!firstLetter) return;
 
       if (!nameObject[firstLetter]) {
         nameObject[firstLetter] = [item];
@@ -117,6 +125,7 @@ const TodoListGroupScreen = () => {
         nameObject[firstLetter]!.push(item);
       }
     });
+    console.log(nameObject);
 
     return Object.entries(nameObject).map(([title, data]) => ({
       title,
@@ -124,39 +133,41 @@ const TodoListGroupScreen = () => {
     }));
   };
 
-  useEffect(() => {
-    const getData = async () => {
-      let results = await getStorageData('todos');
+  const getData = React.useCallback(async () => {
+    let results = await getStorageData('todos');
 
-      console.log(results);
-      let processedData = [];
-      if (results !== null) {
-        for (const [tempYear, tempMonths] of Object.entries(results)) {
-          for (const [tempMonth, tempDays] of Object.entries(
-            tempMonths as {[key: string]: TempType[]},
+    let processedData = [];
+    if (results !== null) {
+      for (const [tempYear, tempMonths] of Object.entries(results)) {
+        for (const [tempMonth, tempDays] of Object.entries(
+          tempMonths as {[key: string]: any},
+        )) {
+          for (const [todo, todos] of Object.entries(
+            tempDays as {[key: string]: {done: boolean; todo: string}[]},
           )) {
-            for (const [todo, todos] of Object.entries(tempDays)) {
-              let dateInfo = `${tempYear}/${tempMonth}/${todo}`;
-              // let doneCount = 0;
-              let aa: TodoItem[] = todos;
+            let dateInfo = `${tempYear}/${tempMonth}/${todo}`;
+            let tempData: {done: boolean; todo: string}[] = todos;
+            let doneCount = tempData.filter(
+              tempEl => tempEl.done === true,
+            ).length;
 
-              let doneCount = aa.filter(todoEl => todoEl.done === true).length;
-
-              processedData.push({
-                fullDate: dateInfo,
-                count: `${doneCount}/${aa.length}`,
-              });
-            }
+            processedData.push({
+              fullDate: dateInfo,
+              count: `${doneCount}/${tempData.length}`,
+            });
           }
         }
       }
-      setTodoData(processedData.reverse());
-      setSections(createSections(processedData));
-    };
-    if (isFocused) {
-      getData();
+      console.log('여기');
+      console.log(processedData.reverse());
     }
-  }, [isFocused]);
+
+    setSections(createSections(processedData));
+  }, []);
+
+  useEffect(() => {
+    getData();
+  }, [getData]);
 
   return (
     <SafeAreaView style={styles.wrapper}>
@@ -165,18 +176,15 @@ const TodoListGroupScreen = () => {
         handleAddTask={handleAddTask}
         centerText={'Todos'}
       />
-      <View style={styles.buttonWrapper}>
-        {todoData.length > 0 && (
-          <SectionList
-            sections={sections}
-            keyExtractor={keyExtractor}
-            contentContainerStyle={styles.sectionStyle}
-            renderItem={renderItem}
-            renderSectionHeader={renderSectionHeader}
-            stickySectionHeadersEnabled={true}
-          />
-        )}
-      </View>
+
+      <SectionList
+        sections={sections}
+        keyExtractor={keyExtractor}
+        contentContainerStyle={styles.sectionStyle}
+        renderItem={renderItem}
+        renderSectionHeader={renderSectionHeader}
+        stickySectionHeadersEnabled={true}
+      />
     </SafeAreaView>
   );
 };
@@ -184,8 +192,11 @@ const TodoListGroupScreen = () => {
 export default TodoListGroupScreen;
 
 const styles = StyleSheet.create({
-  wrapper: {flex: 1, position: 'relative', paddingHorizontal: 10},
-
+  wrapper: {
+    flex: 1,
+    position: 'relative',
+    paddingHorizontal: 10,
+  },
   header: {
     paddingVertical: 10,
     marginBottom: 10,
@@ -208,6 +219,8 @@ const styles = StyleSheet.create({
     height: 25,
   },
   buttonWrapper: {
+    width: '100%',
+    height: '100%',
     gap: 10,
     flexDirection: 'row',
     alignItems: 'center',
@@ -248,7 +261,11 @@ const styles = StyleSheet.create({
   sectionHeader: {
     backgroundColor: '#F2F2F2',
   },
-  sectionStyle: {gap: 10},
+  sectionStyle: {
+    width: '100%',
+    height: '100%',
+    gap: 10,
+  },
   countText: {
     color: '#C4C4C4',
   },
