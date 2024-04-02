@@ -8,8 +8,15 @@ import {
   View,
 } from 'react-native';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
+import Animated, {
+  useAnimatedRef,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import ReusableHeader from '../components/Headers/ReusableHeader';
+import {useLayout} from '../hooks/useLayout';
 import {getStorageData} from '../lib/storage-helper';
 import {useTodoList} from '../recoil/Todo';
 import {ITodoItem} from '../types/todos';
@@ -33,12 +40,27 @@ export interface SectionType {
 
 const TodoListGroupScreen = () => {
   const navigation = useNavigation();
-
   const {setTodos} = useTodoList();
-
   const [sections, setSections] = useState<SectionType[]>([]);
 
-  const handleClick = () => {
+  const [layout, onLayout] = useLayout();
+
+  const translateX = useSharedValue(0);
+  const deleteBtnWidth = useSharedValue(0);
+
+  const listAnimatedStyle = useAnimatedStyle(() => {
+    if (translateX.value > 0) {
+      return {
+        transform: [{translateX: 0}],
+      };
+    } else {
+      return {
+        transform: [{translateX: translateX.value}],
+      };
+    }
+  });
+
+  const handleBackClick = () => {
     navigation.goBack();
   };
 
@@ -53,42 +75,43 @@ const TodoListGroupScreen = () => {
       </View>
     );
   };
+  const [clicked, setClicked] = useState<boolean>(false);
 
   const handleListClicked = (item: IItemType) => {
     setTodos(item.fullDate, item.todos);
+    setClicked(true);
     navigation.navigate('TodoListScreen');
   };
-
-  // const panGestureEvent = Gesture.Pan()
-  //   .onStart(() => {
-  //     console.log('dfdf');
-  //   })
-  //   .onUpdate(event => {
-  //     console.log(event.translationX);
-  //   });
 
   const keyExtractor = (item: IItemType) =>
     `section-list-item-=${item.fullDate}`;
 
+  const animatedRef = useAnimatedRef();
+
   const renderItem = ({item}: {item: IItemType}) => {
     const panGestureEvent = Gesture.Pan()
-      .onStart(() => {
-        console.log('dfdf');
-      })
+      .onStart(() => {})
       .onUpdate(event => {
+        // 1. 오른쪽으로는
+        if (translateX.value === 0 && event.translationX > 0) {
+          return;
+        } else {
+          if (translateX.value + event.translationX > 0) {
+            translateX.value = withTiming(0);
+          } else {
+            translateX.value = withTiming(event.translationX);
+          }
+        }
+
         console.log(event.translationX);
+        console.log(animatedRef.current);
       });
     return (
-      <GestureDetector
-        // gesture={Gesture.Pan()
-        //   .onStart(() => {
-        //     console.log('dfdf');
-        //   })
-        //   .onUpdate(event => {
-        //     console.log(event.translationX);
-        //   })}
-        gesture={panGestureEvent}>
-        <View>
+      <GestureDetector gesture={panGestureEvent}>
+        <Animated.View
+          onLayout={onLayout}
+          ref={animatedRef}
+          style={[styles.listBox, listAnimatedStyle]}>
           <TouchableOpacity
             onPress={() => handleListClicked(item)}
             activeOpacity={0.7}
@@ -98,19 +121,10 @@ const TodoListGroupScreen = () => {
             </Text>
             <Text style={styles.countText}>{item.count}</Text>
           </TouchableOpacity>
-          <View
-            style={{
-              position: 'absolute',
-              width: 100,
-              height: '100%',
-              alignItems: 'center',
-              justifyContent: 'center',
-              right: 0,
-              opacity: 0,
-            }}>
+          <Animated.View style={[styles.deleteBtn]}>
             <Text>dfdf</Text>
-          </View>
-        </View>
+          </Animated.View>
+        </Animated.View>
       </GestureDetector>
     );
   };
@@ -120,7 +134,6 @@ const TodoListGroupScreen = () => {
 
     datas.forEach(item => {
       const firstLetter = item.fullDate.slice(0, 7);
-      console.log(firstLetter);
 
       if (!nameObject[firstLetter]) {
         nameObject[firstLetter] = [item];
@@ -128,7 +141,6 @@ const TodoListGroupScreen = () => {
         nameObject[firstLetter]!.push(item);
       }
     });
-    console.log(nameObject);
 
     return Object.entries(nameObject).map(([title, data]) => ({
       title,
@@ -174,7 +186,7 @@ const TodoListGroupScreen = () => {
   return (
     <SafeAreaView style={styles.wrapper}>
       <ReusableHeader
-        handleClick={handleClick}
+        handleClick={handleBackClick}
         handleAddTask={handleAddTask}
         centerText={'Todos'}
       />
@@ -256,6 +268,10 @@ const styles = StyleSheet.create({
     shadowRadius: 1,
     elevation: 1,
   },
+  listBox: {
+    width: '100%',
+    // position: 'absolute',
+  },
   dateText: {
     fontWeight: '600',
     fontSize: 16,
@@ -270,5 +286,15 @@ const styles = StyleSheet.create({
   },
   countText: {
     color: '#C4C4C4',
+  },
+
+  deleteBtn: {
+    position: 'absolute',
+    width: 0,
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    right: 0,
+    opacity: 0,
   },
 });
