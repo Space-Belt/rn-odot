@@ -2,10 +2,12 @@ import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {
   SectionList,
+  StyleProp,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from 'react-native';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Animated, {
@@ -15,6 +17,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import Trash from '../assets/images/trashIcon.svg';
 import ReusableHeader from '../components/Headers/ReusableHeader';
 import {useLayout} from '../hooks/useLayout';
 import {getStorageData} from '../lib/storage-helper';
@@ -60,6 +63,18 @@ const TodoListGroupScreen = () => {
     }
   });
 
+  const deleteBtnAnimatedStyle = useAnimatedStyle(() => {
+    if (translateX.value > 0) {
+      return {
+        width: 0,
+      };
+    } else {
+      return {
+        width: deleteBtnWidth.value,
+      };
+    }
+  });
+
   const handleBackClick = () => {
     navigation.goBack();
   };
@@ -87,18 +102,24 @@ const TodoListGroupScreen = () => {
     `section-list-item-=${item.fullDate}`;
 
   const animatedRef = useAnimatedRef();
+  const tempDeleteBtnWidth = useSharedValue(0);
 
+  const showDelete: StyleProp<ViewStyle> = {display: 'flex'};
   const renderItem = ({item}: {item: IItemType}) => {
     const panGestureEvent = Gesture.Pan()
-      .onStart(() => {})
+      .onStart(() => {
+        tempDeleteBtnWidth.value = deleteBtnWidth.value;
+      })
       .onUpdate(event => {
         // 1. 오른쪽으로는
         if (translateX.value === 0 && event.translationX > 0) {
           return;
         } else {
           if (translateX.value + event.translationX > 0) {
+            deleteBtnWidth.value = withTiming(0);
             translateX.value = withTiming(0);
           } else {
+            deleteBtnWidth.value = withTiming(-event.translationX);
             translateX.value = withTiming(event.translationX);
           }
         }
@@ -107,25 +128,31 @@ const TodoListGroupScreen = () => {
         console.log(animatedRef.current);
       });
     return (
-      <GestureDetector gesture={panGestureEvent}>
-        <Animated.View
-          onLayout={onLayout}
-          ref={animatedRef}
-          style={[styles.listBox, listAnimatedStyle]}>
-          <TouchableOpacity
-            onPress={() => handleListClicked(item)}
-            activeOpacity={0.7}
-            style={styles.listWrapper}>
-            <Text style={styles.dateText}>
-              {item.fullDate.slice(8, 10)}일 Todos
-            </Text>
-            <Text style={styles.countText}>{item.count}</Text>
-          </TouchableOpacity>
-          <Animated.View style={[styles.deleteBtn]}>
-            <Text>dfdf</Text>
+      <View>
+        <GestureDetector gesture={panGestureEvent}>
+          <Animated.View
+            onLayout={onLayout}
+            ref={animatedRef}
+            style={[styles.listBox, listAnimatedStyle]}>
+            <TouchableOpacity
+              onPress={() => handleListClicked(item)}
+              activeOpacity={0.7}
+              style={styles.listWrapper}>
+              <Text style={styles.dateText}>
+                {item.fullDate.slice(8, 10)}일 Todos
+              </Text>
+              <Text style={styles.countText}>{item.count}</Text>
+            </TouchableOpacity>
           </Animated.View>
+        </GestureDetector>
+        <Animated.View style={[styles.deleteBtn, deleteBtnAnimatedStyle]}>
+          {/* <Animated.View> */}
+          {/* <View> */}
+          <Trash style={[styles.trashIcon]} />
+          {/* </View> */}
+          {/* </Animated.View> */}
         </Animated.View>
-      </GestureDetector>
+      </View>
     );
   };
 
@@ -290,11 +317,18 @@ const styles = StyleSheet.create({
 
   deleteBtn: {
     position: 'absolute',
+    zIndex: 10,
     width: 0,
     height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
     right: 0,
-    opacity: 0,
+    opacity: 100,
+    borderRadius: 10,
+    backgroundColor: 'red',
+    flexWrap: 'nowrap',
+  },
+  trashIcon: {
+    display: 'none',
   },
 });
