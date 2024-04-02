@@ -2,22 +2,20 @@ import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {
   SectionList,
-  StyleProp,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  ViewStyle,
 } from 'react-native';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Animated, {
+  runOnJS,
   useAnimatedRef,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import Trash from '../assets/images/trashIcon.svg';
 import ReusableHeader from '../components/Headers/ReusableHeader';
 import {useLayout} from '../hooks/useLayout';
 import {getStorageData} from '../lib/storage-helper';
@@ -50,9 +48,11 @@ const TodoListGroupScreen = () => {
 
   const translateX = useSharedValue(0);
   const deleteBtnWidth = useSharedValue(0);
+  const deleteBtnSize = useSharedValue<'none' | 'flex' | undefined>('none');
 
   const listAnimatedStyle = useAnimatedStyle(() => {
     if (translateX.value > 0) {
+      // runOnJS(setClicked)(false);
       return {
         transform: [{translateX: 0}],
       };
@@ -73,6 +73,13 @@ const TodoListGroupScreen = () => {
         width: deleteBtnWidth.value,
       };
     }
+  });
+
+  const deleteBtnSizeAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      // width: deleteBtnSize.value,
+      display: deleteBtnSize.value,
+    };
   });
 
   const handleBackClick = () => {
@@ -104,7 +111,10 @@ const TodoListGroupScreen = () => {
   const animatedRef = useAnimatedRef();
   const tempDeleteBtnWidth = useSharedValue(0);
 
-  const showDelete: StyleProp<ViewStyle> = {display: 'flex'};
+  const [svgWidth, setSvgWidth] = useState<boolean>(false);
+
+  const svgSize = {display: svgWidth ? 'flex' : 'none'};
+
   const renderItem = ({item}: {item: IItemType}) => {
     const panGestureEvent = Gesture.Pan()
       .onStart(() => {
@@ -122,10 +132,17 @@ const TodoListGroupScreen = () => {
             deleteBtnWidth.value = withTiming(-event.translationX);
             translateX.value = withTiming(event.translationX);
           }
+          if (translateX.value < -20) {
+            //   deleteBtnSize.value = withTiming('flex', {duration: 200});
+            // deleteBtnSize.value = withTiming('flex');
+            runOnJS(setClicked)(true);
+          } else if (translateX.value > -20) {
+            console.log(translateX.value);
+            runOnJS(setClicked)(false);
+            // deleteBtnSize.value = withTiming('none');
+            //   deleteBtnSize.value = withTiming('none', {duration: 200});
+          }
         }
-
-        console.log(event.translationX);
-        console.log(animatedRef.current);
       });
     return (
       <View>
@@ -146,15 +163,20 @@ const TodoListGroupScreen = () => {
           </Animated.View>
         </GestureDetector>
         <Animated.View style={[styles.deleteBtn, deleteBtnAnimatedStyle]}>
-          {/* <Animated.View> */}
-          {/* <View> */}
-          <Trash style={[styles.trashIcon]} />
-          {/* </View> */}
-          {/* </Animated.View> */}
+          {clicked && (
+            <Animated.Image
+              style={[styles.imgControl]}
+              source={require('../assets/images/trashIcon.png')}
+            />
+          )}
         </Animated.View>
       </View>
     );
   };
+
+  useEffect(() => {
+    console.log(svgWidth);
+  }, [svgWidth]);
 
   const createSections = (datas: IItemType[]): SectionType[] => {
     const nameObject: Record<string, IItemType[]> = {};
@@ -325,10 +347,15 @@ const styles = StyleSheet.create({
     right: 0,
     opacity: 100,
     borderRadius: 10,
-    backgroundColor: 'red',
+    // backgroundColor: 'red',
     flexWrap: 'nowrap',
   },
   trashIcon: {
-    display: 'none',
+    opacity: 0,
+  },
+  imgControl: {
+    backgroundColor: 'red',
+    width: 30,
+    height: 30,
   },
 });
