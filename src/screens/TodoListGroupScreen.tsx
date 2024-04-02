@@ -52,7 +52,6 @@ const TodoListGroupScreen = () => {
 
   const listAnimatedStyle = useAnimatedStyle(() => {
     if (translateX.value > 0) {
-      // runOnJS(setClicked)(false);
       return {
         transform: [{translateX: 0}],
       };
@@ -126,22 +125,28 @@ const TodoListGroupScreen = () => {
           return;
         } else {
           if (translateX.value + event.translationX > 0) {
-            deleteBtnWidth.value = withTiming(0);
-            translateX.value = withTiming(0);
+            deleteBtnWidth.value = withTiming(0, {}, () => {
+              runOnJS(setClicked)(false);
+            });
+            translateX.value = withTiming(0, {}, () => {
+              runOnJS(setClicked)(false);
+            });
           } else {
-            deleteBtnWidth.value = withTiming(-event.translationX);
+            deleteBtnWidth.value = withTiming(-event.translationX, {}, () => {
+              deleteBtnWidth.value > 30 && runOnJS(setClicked)(true);
+            });
             translateX.value = withTiming(event.translationX);
           }
-          if (translateX.value < -20) {
-            //   deleteBtnSize.value = withTiming('flex', {duration: 200});
-            // deleteBtnSize.value = withTiming('flex');
-            runOnJS(setClicked)(true);
-          } else if (translateX.value > -20) {
-            console.log(translateX.value);
-            runOnJS(setClicked)(false);
-            // deleteBtnSize.value = withTiming('none');
-            //   deleteBtnSize.value = withTiming('none', {duration: 200});
-          }
+          // if (translateX.value < -20) {
+          //   //   deleteBtnSize.value = withTiming('flex', {duration: 200});
+          //   // deleteBtnSize.value = withTiming('flex');
+          //   runOnJS(setClicked)(true);
+          // } else if (translateX.value > -20) {
+          //   console.log(translateX.value);
+          //   runOnJS(setClicked)(false);
+          //   // deleteBtnSize.value = withTiming('none');
+          //   //   deleteBtnSize.value = withTiming('none', {duration: 200});
+          // }
         }
       });
     return (
