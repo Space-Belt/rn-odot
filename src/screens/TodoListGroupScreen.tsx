@@ -1,25 +1,10 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import {
-  SectionList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import {Gesture, GestureDetector} from 'react-native-gesture-handler';
-import Animated, {
-  runOnJS,
-  useAnimatedRef,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import {SectionList, StyleSheet, Text, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import ReusableHeader from '../components/Headers/ReusableHeader';
-import {useLayout} from '../hooks/useLayout';
+import TodoGroupSectionList from '../components/Todo/List/TodoGroupSectionList';
 import {getStorageData} from '../lib/storage-helper';
-import {useTodoList} from '../recoil/Todo';
 import {ITodoItem} from '../types/todos';
 
 export interface Item {
@@ -41,45 +26,8 @@ export interface SectionType {
 
 const TodoListGroupScreen = () => {
   const navigation = useNavigation();
-  const {setTodos} = useTodoList();
+
   const [sections, setSections] = useState<SectionType[]>([]);
-
-  const [layout, onLayout] = useLayout();
-
-  const translateX = useSharedValue(0);
-  const deleteBtnWidth = useSharedValue(0);
-  const deleteBtnSize = useSharedValue<'none' | 'flex' | undefined>('none');
-
-  const listAnimatedStyle = useAnimatedStyle(() => {
-    if (translateX.value > 0) {
-      return {
-        transform: [{translateX: 0}],
-      };
-    } else {
-      return {
-        transform: [{translateX: translateX.value}],
-      };
-    }
-  });
-
-  const deleteBtnAnimatedStyle = useAnimatedStyle(() => {
-    if (translateX.value > 0) {
-      return {
-        width: 0,
-      };
-    } else {
-      return {
-        width: deleteBtnWidth.value,
-      };
-    }
-  });
-
-  const deleteBtnSizeAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      // width: deleteBtnSize.value,
-      display: deleteBtnSize.value,
-    };
-  });
 
   const handleBackClick = () => {
     navigation.goBack();
@@ -96,92 +44,13 @@ const TodoListGroupScreen = () => {
       </View>
     );
   };
-  const [clicked, setClicked] = useState<boolean>(false);
-
-  const handleListClicked = (item: IItemType) => {
-    setTodos(item.fullDate, item.todos);
-    setClicked(true);
-    navigation.navigate('TodoListScreen');
-  };
 
   const keyExtractor = (item: IItemType) =>
     `section-list-item-=${item.fullDate}`;
 
-  const animatedRef = useAnimatedRef();
-  const tempDeleteBtnWidth = useSharedValue(0);
-
-  const [svgWidth, setSvgWidth] = useState<boolean>(false);
-
-  const svgSize = {display: svgWidth ? 'flex' : 'none'};
-
   const renderItem = ({item}: {item: IItemType}) => {
-    const panGestureEvent = Gesture.Pan()
-      .onStart(() => {
-        tempDeleteBtnWidth.value = deleteBtnWidth.value;
-      })
-      .onUpdate(event => {
-        // 1. 오른쪽으로는
-        if (translateX.value === 0 && event.translationX > 0) {
-          return;
-        } else {
-          if (translateX.value + event.translationX > 0) {
-            deleteBtnWidth.value = withTiming(0, {}, () => {
-              runOnJS(setClicked)(false);
-            });
-            translateX.value = withTiming(0, {}, () => {
-              runOnJS(setClicked)(false);
-            });
-          } else {
-            deleteBtnWidth.value = withTiming(-event.translationX, {}, () => {
-              deleteBtnWidth.value > 30 && runOnJS(setClicked)(true);
-            });
-            translateX.value = withTiming(event.translationX);
-          }
-          // if (translateX.value < -20) {
-          //   //   deleteBtnSize.value = withTiming('flex', {duration: 200});
-          //   // deleteBtnSize.value = withTiming('flex');
-          //   runOnJS(setClicked)(true);
-          // } else if (translateX.value > -20) {
-          //   console.log(translateX.value);
-          //   runOnJS(setClicked)(false);
-          //   // deleteBtnSize.value = withTiming('none');
-          //   //   deleteBtnSize.value = withTiming('none', {duration: 200});
-          // }
-        }
-      });
-    return (
-      <View>
-        <GestureDetector gesture={panGestureEvent}>
-          <Animated.View
-            onLayout={onLayout}
-            ref={animatedRef}
-            style={[styles.listBox, listAnimatedStyle]}>
-            <TouchableOpacity
-              onPress={() => handleListClicked(item)}
-              activeOpacity={0.7}
-              style={styles.listWrapper}>
-              <Text style={styles.dateText}>
-                {item.fullDate.slice(8, 10)}일 Todos
-              </Text>
-              <Text style={styles.countText}>{item.count}</Text>
-            </TouchableOpacity>
-          </Animated.View>
-        </GestureDetector>
-        <Animated.View style={[styles.deleteBtn, deleteBtnAnimatedStyle]}>
-          {clicked && (
-            <Animated.Image
-              style={[styles.imgControl]}
-              source={require('../assets/images/trashIcon.png')}
-            />
-          )}
-        </Animated.View>
-      </View>
-    );
+    return <TodoGroupSectionList item={item} />;
   };
-
-  useEffect(() => {
-    console.log(svgWidth);
-  }, [svgWidth]);
 
   const createSections = (datas: IItemType[]): SectionType[] => {
     const nameObject: Record<string, IItemType[]> = {};
