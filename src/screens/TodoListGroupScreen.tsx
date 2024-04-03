@@ -50,8 +50,9 @@ const TodoListGroupScreen = () => {
   const handleDeleteItem = (date: string) => {
     let clonedData = {...fullData};
     let [yyyy, mm, dd] = date.split('/');
-    console.log(clonedData[yyyy][mm][dd]);
-    let aad = delete clonedData[yyyy][mm][dd];
+    delete clonedData[yyyy][mm][dd];
+    setFullData(clonedData);
+    makeSectionFunction(clonedData);
     AsyncStorage.setItem('todos', JSON.stringify(clonedData));
   };
 
@@ -83,14 +84,10 @@ const TodoListGroupScreen = () => {
     }));
   };
 
-  const getData = React.useCallback(async () => {
-    // clearStorageData();
-    let results = await getStorageData('todos');
-
-    setFullData(results);
+  const makeSectionFunction = (data: IWholeTodoList) => {
     let processedData = [];
-    if (results !== null) {
-      for (const [tempYear, tempMonths] of Object.entries(results)) {
+    if (data !== null) {
+      for (const [tempYear, tempMonths] of Object.entries(data)) {
         for (const [tempMonth, tempDays] of Object.entries(
           tempMonths as {[key: string]: any},
         )) {
@@ -98,9 +95,7 @@ const TodoListGroupScreen = () => {
           for (const [todo, todos] of Object.entries(
             tempDays as {[key: string]: {done: boolean; todo: string}[]},
           )) {
-            // if(todo)
             let dateInfo = `${tempYear}/${tempMonth}/${todo}`;
-            // console.log(todos);
             let tempData: {done: boolean; todo: string}[] = [...todos];
             let doneCount = tempData.filter(
               tempEl => tempEl.done === true,
@@ -116,6 +111,15 @@ const TodoListGroupScreen = () => {
     }
 
     setSections(createSections(processedData.reverse()));
+  };
+
+  const getData = React.useCallback(async () => {
+    // clearStorageData();
+    let results = await getStorageData('todos');
+
+    setFullData(results);
+
+    makeSectionFunction(results);
   }, []);
 
   useEffect(() => {

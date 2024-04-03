@@ -1,9 +1,8 @@
 import {useNavigation} from '@react-navigation/native';
-
 import React, {useState} from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
-import Animated, {
+import {
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
@@ -11,14 +10,21 @@ import Animated, {
 } from 'react-native-reanimated';
 import {useLayout} from '../../../hooks/useLayout';
 import {useTodoList} from '../../../recoil/Todo';
-import {IItemType} from '../../../screens/TodoListGroupScreen';
+import {ITodoItem} from '../../../types/todos';
 
 type props = {
-  item: IItemType;
-  handleDeleteItem: (args: string) => void;
+  odotList: ITodoItem[];
+  todo: ITodoItem;
+  index: number;
+  handleCheckTodoList: (args: number) => void;
 };
 
-const TodoGroupSectionList = ({item, handleDeleteItem}: props) => {
+const TodoRenderingList = ({
+  odotList,
+  todo,
+  index,
+  handleCheckTodoList,
+}: props) => {
   const tempDeleteBtnWidth = useSharedValue(0);
   const [layout, onLayout] = useLayout();
 
@@ -54,12 +60,6 @@ const TodoGroupSectionList = ({item, handleDeleteItem}: props) => {
       };
     }
   });
-
-  const handleListClicked = (items: IItemType) => {
-    setTodos(items.fullDate, items.todos);
-    navigation.navigate('TodoListScreen');
-  };
-
   const tempTranslateX = useSharedValue(0);
 
   const panGestureEvent = Gesture.Pan()
@@ -97,83 +97,60 @@ const TodoGroupSectionList = ({item, handleDeleteItem}: props) => {
       }
     })
     .onEnd(event => {
-      if (event.absoluteX < 15) {
-        runOnJS(handleDeleteItem)(item.fullDate);
-      }
+      // if (event.absoluteX < 15) {
+      //   runOnJS(handleDeleteItem)(item.fullDate);
+      // }
     });
 
   return (
-    <View>
-      <GestureDetector gesture={panGestureEvent}>
-        <Animated.View
-          onLayout={onLayout}
-          style={[styles.listBox, listAnimatedStyle]}>
-          <TouchableOpacity
-            onPress={() => handleListClicked(item)}
-            activeOpacity={0.7}
-            style={styles.listWrapper}>
-            <Text style={styles.dateText}>
-              {item?.fullDate.slice(8, 10)}일 Todos
-            </Text>
-            <Text style={styles.countText}>{item?.count}</Text>
-          </TouchableOpacity>
-        </Animated.View>
-      </GestureDetector>
-      <Animated.View style={[styles.deleteBtn, deleteBtnAnimatedStyle]}>
-        <TouchableOpacity onPress={() => handleDeleteItem(item.fullDate)}>
-          {clicked && (
-            <Animated.Image
-              style={[styles.imgControl]}
-              source={require('../../../assets/images/trashIcon.png')}
+    <GestureDetector gesture={panGestureEvent}>
+      <TouchableOpacity
+        onPress={() => handleCheckTodoList(index)}
+        key={`todos-${index}`}>
+        <View
+          style={[
+            styles.todo,
+            odotList.length - 1 === index ? {marginBottom: 10} : {},
+          ]}>
+          {todo.done !== undefined && todo.done !== false ? (
+            <Image
+              style={styles.checkImg}
+              source={require('../../../assets/images/checked.png')}
+            />
+          ) : (
+            <Image
+              style={styles.checkImg}
+              source={require('../../../assets/images/unchecked.png')}
             />
           )}
-        </TouchableOpacity>
-      </Animated.View>
-    </View>
+          <View style={styles.todoStyle}>
+            <Text>{todo.todo}</Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    </GestureDetector>
   );
 };
 
-export default TodoGroupSectionList;
+export default TodoRenderingList;
 
 const styles = StyleSheet.create({
-  listBox: {
-    width: '100%',
-  },
-  listWrapper: {
+  todo: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 10,
+    alignItems: 'center',
+    paddingVertical: 15,
     paddingHorizontal: 10,
-    backgroundColor: '#ffffff',
     borderRadius: 10,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 0},
-    shadowOpacity: 0.2,
-    shadowRadius: 1,
-    elevation: 1,
+    backgroundColor: '#fff',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.5,
+    marginTop: 15,
   },
-  dateText: {
-    fontWeight: '600',
-    fontSize: 16,
+
+  checkImg: {
+    width: 25,
+    height: 25,
   },
-  countText: {
-    color: '#C4C4C4',
-  },
-  deleteBtn: {
-    position: 'absolute',
-    zIndex: 10,
-    width: 0,
-    height: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    right: 0,
-    opacity: 100,
-    borderRadius: 10,
-    backgroundColor: 'red',
-    flexWrap: 'nowrap',
-  },
-  imgControl: {
-    width: 30,
-    height: 30,
-  },
+  todoStyle: {marginLeft: 5},
 });

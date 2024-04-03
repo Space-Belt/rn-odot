@@ -1,16 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from 'react';
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {ScrollView, StyleSheet} from 'react-native';
 import {Gesture} from 'react-native-gesture-handler';
 import {useTodoList} from '../../../recoil/Todo';
 import {ITodoItem, IWholeTodoList} from '../../../types/todos';
+import TodoRenderingList from './TodoRenderingList';
 
 type props = {
   odotList: ITodoItem[];
@@ -52,30 +46,12 @@ const TodoList = ({
   return (
     <ScrollView style={styles.scrollViewStyle}>
       {odotList.map((todo, i) => (
-        <TouchableOpacity
-          onPress={() => handleCheckTodoList(i)}
-          key={`todos-${i}`}>
-          <View
-            style={[
-              styles.todo,
-              odotList.length - 1 === i ? {marginBottom: 10} : {},
-            ]}>
-            {todo.done !== undefined && todo.done !== false ? (
-              <Image
-                style={styles.checkImg}
-                source={require('../../../assets/images/checked.png')}
-              />
-            ) : (
-              <Image
-                style={styles.checkImg}
-                source={require('../../../assets/images/unchecked.png')}
-              />
-            )}
-            <View style={styles.todoStyle}>
-              <Text>{todo.todo}</Text>
-            </View>
-          </View>
-        </TouchableOpacity>
+        <TodoRenderingList
+          odotList={odotList}
+          todo={todo}
+          index={i}
+          handleCheckTodoList={handleCheckTodoList}
+        />
       ))}
     </ScrollView>
   );
