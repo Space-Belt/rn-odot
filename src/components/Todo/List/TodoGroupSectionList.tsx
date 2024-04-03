@@ -15,9 +15,10 @@ import {IItemType} from '../../../screens/TodoListGroupScreen';
 
 type props = {
   item: IItemType;
+  handleDeleteItem: (args: string) => void;
 };
 
-const TodoGroupSectionList = ({item}: props) => {
+const TodoGroupSectionList = ({item, handleDeleteItem}: props) => {
   const tempDeleteBtnWidth = useSharedValue(0);
   const [layout, onLayout] = useLayout();
 
@@ -54,28 +55,24 @@ const TodoGroupSectionList = ({item}: props) => {
     }
   });
 
-  const deleteBtnSizeAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      // width: deleteBtnSize.value,
-      display: deleteBtnSize.value,
-    };
-  });
-  const handleListClicked = (item: IItemType) => {
-    setTodos(item.fullDate, item.todos);
-
+  const handleListClicked = (items: IItemType) => {
+    setTodos(items.fullDate, items.todos);
     navigation.navigate('TodoListScreen');
   };
+
+  const tempTranslateX = useSharedValue(0);
 
   const panGestureEvent = Gesture.Pan()
     .onStart(() => {
       tempDeleteBtnWidth.value = deleteBtnWidth.value;
+      tempTranslateX.value = translateX.value;
     })
     .onUpdate(event => {
-      // 1. 오른쪽으로는
       if (translateX.value === 0 && event.translationX > 0) {
         return;
       } else {
-        if (translateX.value + event.translationX > 0) {
+        console.log(event.translationX);
+        if (tempTranslateX.value + event.translationX > 0) {
           deleteBtnWidth.value = withTiming(0, {}, () => {
             runOnJS(setClicked)(false);
           });
@@ -83,23 +80,28 @@ const TodoGroupSectionList = ({item}: props) => {
             runOnJS(setClicked)(false);
           });
         } else {
-          deleteBtnWidth.value = withTiming(-event.translationX, {}, () => {
-            deleteBtnWidth.value > 30 && runOnJS(setClicked)(true);
-          });
-          translateX.value = withTiming(event.translationX);
+          deleteBtnWidth.value = withTiming(
+            tempDeleteBtnWidth.value - event.translationX,
+            {},
+            () => {
+              deleteBtnWidth.value > 40 && runOnJS(setClicked)(true);
+            },
+          );
+          translateX.value = withTiming(
+            tempTranslateX.value + event.translationX,
+          );
+          if (event.translationX > layout.width / 2) {
+            runOnJS(setClicked)(false);
+          }
         }
-        // if (translateX.value < -20) {
-        //   //   deleteBtnSize.value = withTiming('flex', {duration: 200});
-        //   // deleteBtnSize.value = withTiming('flex');
-        //   runOnJS(setClicked)(true);
-        // } else if (translateX.value > -20) {
-        //   console.log(translateX.value);
-        //   runOnJS(setClicked)(false);
-        //   // deleteBtnSize.value = withTiming('none');
-        //   //   deleteBtnSize.value = withTiming('none', {duration: 200});
-        // }
+      }
+    })
+    .onEnd(event => {
+      if (event.absoluteX < 25) {
+        runOnJS(handleDeleteItem)(item.fullDate);
       }
     });
+
   return (
     <View>
       <GestureDetector gesture={panGestureEvent}>
@@ -118,12 +120,14 @@ const TodoGroupSectionList = ({item}: props) => {
         </Animated.View>
       </GestureDetector>
       <Animated.View style={[styles.deleteBtn, deleteBtnAnimatedStyle]}>
-        {clicked && (
-          <Animated.Image
-            style={[styles.imgControl]}
-            source={require('../../../assets/images/trashIcon.png')}
-          />
-        )}
+        <TouchableOpacity onPress={() => handleDeleteItem(item.fullDate)}>
+          {clicked && (
+            <Animated.Image
+              style={[styles.imgControl]}
+              source={require('../../../assets/images/trashIcon.png')}
+            />
+          )}
+        </TouchableOpacity>
       </Animated.View>
     </View>
   );
@@ -134,7 +138,6 @@ export default TodoGroupSectionList;
 const styles = StyleSheet.create({
   listBox: {
     width: '100%',
-    // position: 'absolute',
   },
   listWrapper: {
     flexDirection: 'row',
@@ -166,11 +169,10 @@ const styles = StyleSheet.create({
     right: 0,
     opacity: 100,
     borderRadius: 10,
-    // backgroundColor: 'red',
+    backgroundColor: 'red',
     flexWrap: 'nowrap',
   },
   imgControl: {
-    backgroundColor: 'red',
     width: 30,
     height: 30,
   },
