@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {SectionList, StyleSheet, Text, View} from 'react-native';
@@ -5,7 +6,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import ReusableHeader from '../components/Headers/ReusableHeader';
 import TodoGroupSectionList from '../components/Todo/List/TodoGroupSectionList';
 import {getStorageData} from '../lib/storage-helper';
-import {ITodoItem} from '../types/todos';
+import {ITodoItem, IWholeTodoList} from '../types/todos';
 
 export interface Item {
   id: number;
@@ -28,6 +29,7 @@ const TodoListGroupScreen = () => {
   const navigation = useNavigation();
 
   const [sections, setSections] = useState<SectionType[]>([]);
+  const [fullData, setFullData] = React.useState<IWholeTodoList>({});
 
   const handleBackClick = () => {
     navigation.goBack();
@@ -45,11 +47,21 @@ const TodoListGroupScreen = () => {
     );
   };
 
+  const handleDeleteItem = (date: string) => {
+    let clonedData = {...fullData};
+    let [yyyy, mm, dd] = date.split('/');
+    console.log(clonedData[yyyy][mm][dd]);
+    let aad = delete clonedData[yyyy][mm][dd];
+    AsyncStorage.setItem('todos', JSON.stringify(clonedData));
+  };
+
   const keyExtractor = (item: IItemType) =>
     `section-list-item-=${item.fullDate}`;
 
   const renderItem = ({item}: {item: IItemType}) => {
-    return <TodoGroupSectionList item={item} />;
+    return (
+      <TodoGroupSectionList item={item} handleDeleteItem={handleDeleteItem} />
+    );
   };
 
   const createSections = (datas: IItemType[]): SectionType[] => {
@@ -72,23 +84,27 @@ const TodoListGroupScreen = () => {
   };
 
   const getData = React.useCallback(async () => {
+    // clearStorageData();
     let results = await getStorageData('todos');
 
+    setFullData(results);
     let processedData = [];
     if (results !== null) {
       for (const [tempYear, tempMonths] of Object.entries(results)) {
         for (const [tempMonth, tempDays] of Object.entries(
           tempMonths as {[key: string]: any},
         )) {
+          console.log(tempDays);
           for (const [todo, todos] of Object.entries(
             tempDays as {[key: string]: {done: boolean; todo: string}[]},
           )) {
+            // if(todo)
             let dateInfo = `${tempYear}/${tempMonth}/${todo}`;
-            let tempData: {done: boolean; todo: string}[] = todos;
+            // console.log(todos);
+            let tempData: {done: boolean; todo: string}[] = [...todos];
             let doneCount = tempData.filter(
               tempEl => tempEl.done === true,
             ).length;
-
             processedData.push({
               fullDate: dateInfo,
               count: `${doneCount}/${tempData.length}`,

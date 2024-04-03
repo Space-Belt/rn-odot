@@ -52,7 +52,6 @@ const TodoList = ({
   return (
     <ScrollView style={styles.scrollViewStyle}>
       {odotList.map((todo, i) => (
-        // <GestureDetector gesture={swipeGestureEvent}>
         <TouchableOpacity
           onPress={() => handleCheckTodoList(i)}
           key={`todos-${i}`}>
@@ -77,7 +76,6 @@ const TodoList = ({
             </View>
           </View>
         </TouchableOpacity>
-        // </GestureDetector>
       ))}
     </ScrollView>
   );
