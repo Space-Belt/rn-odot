@@ -2,7 +2,7 @@ import {useNavigation} from '@react-navigation/native';
 import React, {useState} from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
-import {
+import Animated, {
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
@@ -17,6 +17,7 @@ type props = {
   todo: ITodoItem;
   index: number;
   handleCheckTodoList: (args: number) => void;
+  handleDeleteTodoList: (args: number) => void;
 };
 
 const TodoRenderingList = ({
@@ -24,8 +25,10 @@ const TodoRenderingList = ({
   todo,
   index,
   handleCheckTodoList,
+  handleDeleteTodoList,
 }: props) => {
   const tempDeleteBtnWidth = useSharedValue(0);
+  const deletBtnOpacity = useSharedValue(0);
   const [layout, onLayout] = useLayout();
 
   const navigation = useNavigation();
@@ -33,7 +36,6 @@ const TodoRenderingList = ({
 
   const translateX = useSharedValue(0);
   const deleteBtnWidth = useSharedValue(0);
-  const deleteBtnSize = useSharedValue<'none' | 'flex' | undefined>('none');
 
   const [clicked, setClicked] = useState<boolean>(false);
 
@@ -50,13 +52,27 @@ const TodoRenderingList = ({
   });
 
   const deleteBtnAnimatedStyle = useAnimatedStyle(() => {
-    if (translateX.value > 0) {
+    if (translateX.value > -10) {
       return {
         width: 0,
+        opacity: 0,
       };
     } else {
       return {
         width: deleteBtnWidth.value,
+        opacity: deletBtnOpacity.value,
+      };
+    }
+  });
+
+  const deleteBtnOpacityAnimatedStyle = useAnimatedStyle(() => {
+    if (translateX.value < -30) {
+      return {
+        opacity: deletBtnOpacity.value,
+      };
+    } else {
+      return {
+        opacity: 0,
       };
     }
   });
@@ -68,11 +84,11 @@ const TodoRenderingList = ({
       tempTranslateX.value = translateX.value;
     })
     .onUpdate(event => {
-      if (translateX.value === 0 && event.translationX > 0) {
+      if (tempTranslateX.value === 0 && event.translationX > 0) {
         return;
       } else {
         console.log(event.translationX);
-        if (tempTranslateX.value + event.translationX > 0) {
+        if (tempTranslateX.value + event.translationX >= 0) {
           deleteBtnWidth.value = withTiming(0, {}, () => {
             runOnJS(setClicked)(false);
           });
@@ -85,6 +101,7 @@ const TodoRenderingList = ({
             {},
             () => {
               deleteBtnWidth.value > 40 && runOnJS(setClicked)(true);
+              deletBtnOpacity.value = withTiming(1, {duration: 200});
             },
           );
           translateX.value = withTiming(
@@ -97,37 +114,53 @@ const TodoRenderingList = ({
       }
     })
     .onEnd(event => {
-      // if (event.absoluteX < 15) {
-      //   runOnJS(handleDeleteItem)(item.fullDate);
-      // }
+      if (event.absoluteX < 25) {
+        runOnJS(handleDeleteTodoList)(index);
+      }
     });
 
   return (
     <GestureDetector gesture={panGestureEvent}>
-      <TouchableOpacity
-        onPress={() => handleCheckTodoList(index)}
-        key={`todos-${index}`}>
-        <View
-          style={[
-            styles.todo,
-            odotList.length - 1 === index ? {marginBottom: 10} : {},
-          ]}>
-          {todo.done !== undefined && todo.done !== false ? (
-            <Image
-              style={styles.checkImg}
-              source={require('../../../assets/images/checked.png')}
+      <View>
+        <TouchableOpacity
+          onPress={() => handleCheckTodoList(index)}
+          key={`todos-${index}`}>
+          <Animated.View
+            style={[
+              styles.todo,
+              odotList.length - 1 === index ? {marginBottom: 10} : {},
+              listAnimatedStyle,
+            ]}>
+            {todo.done !== undefined && todo.done !== false ? (
+              <Image
+                style={styles.checkImg}
+                source={require('../../../assets/images/checked.png')}
+              />
+            ) : (
+              <Image
+                style={styles.checkImg}
+                source={require('../../../assets/images/unchecked.png')}
+              />
+            )}
+            <View style={styles.todoStyle}>
+              <Text>{todo.todo}</Text>
+            </View>
+          </Animated.View>
+        </TouchableOpacity>
+        {/* {clicked && ( */}
+        <Animated.View style={[styles.deleteBtn, deleteBtnAnimatedStyle]}>
+          <TouchableOpacity
+            onPress={() => {
+              handleDeleteTodoList(index);
+            }}>
+            <Animated.Image
+              style={[styles.imgControl, deleteBtnOpacityAnimatedStyle]}
+              source={require('../../../assets/images/trashIcon.png')}
             />
-          ) : (
-            <Image
-              style={styles.checkImg}
-              source={require('../../../assets/images/unchecked.png')}
-            />
-          )}
-          <View style={styles.todoStyle}>
-            <Text>{todo.todo}</Text>
-          </View>
-        </View>
-      </TouchableOpacity>
+          </TouchableOpacity>
+        </Animated.View>
+        {/* )} */}
+      </View>
     </GestureDetector>
   );
 };
@@ -138,8 +171,9 @@ const styles = StyleSheet.create({
   todo: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 15,
+    // paddingVertical: 15,
     paddingHorizontal: 10,
+    height: 45,
     borderRadius: 10,
     shadowColor: '#000',
     backgroundColor: '#fff',
@@ -153,4 +187,24 @@ const styles = StyleSheet.create({
     height: 25,
   },
   todoStyle: {marginLeft: 5},
+  deleteBtn: {
+    top: 15,
+    position: 'absolute',
+    zIndex: 10,
+    width: 0,
+    height: 45,
+    paddingVertical: 13,
+    paddingHorizontal: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    right: 0,
+    opacity: 100,
+    borderRadius: 10,
+    backgroundColor: 'red',
+    flexWrap: 'nowrap',
+  },
+  imgControl: {
+    width: 30,
+    height: 30,
+  },
 });
