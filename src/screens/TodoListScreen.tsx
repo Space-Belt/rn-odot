@@ -55,7 +55,10 @@ const TodoListScreen = () => {
     if (results === null) {
       return;
     }
-
+    setTodoItem({
+      fullDate: `${thisYear}/${thisMonth}/${thisDay}`,
+      todos: results[thisYear][thisMonth][thisDay],
+    });
     setFullData(results);
   };
 
