@@ -13,7 +13,7 @@ import {useIsFocused} from '@react-navigation/native';
 import MainHeader from '../components/Headers/MainHeader';
 import NewTaskBottomsheet from '../components/NewTask/NewTaskBottomsheet';
 
-import {useRecoilValue} from 'recoil';
+import {useRecoilState} from 'recoil';
 import TodoList from '../components/Todo/List/TodoList';
 import ProgressBar from '../components/Todo/Progress/ProgressBar';
 import {getStorageData} from '../lib/storage-helper';
@@ -28,7 +28,8 @@ const TodoListScreen = () => {
   const {showBottomSheet} = useBottomSheet();
 
   const {isVisible} = useToast();
-  const todoItem = useRecoilValue(todoList);
+  // const todoItem = useRecoilValue(todoList);
+  const [todoItem, setTodoItem] = useRecoilState(todoList);
 
   const [thisYear, thisMonth, thisDay] = todoItem.fullDate.split('/');
 
@@ -66,7 +67,11 @@ const TodoListScreen = () => {
         {/* 앱에서는 네비게이션이함 nav */}
         <MainHeader />
         <View style={styles.dateWrapper}>
-          <Text style={styles.dateText}>{todoItem.fullDate}</Text>
+          <Text style={styles.dateText}>
+            {todoItem.fullDate === ''
+              ? `${thisYear}/${thisMonth}/${thisYear}`
+              : todoItem.fullDate}
+          </Text>
         </View>
         <ProgressBar
           percentageWidth={percentageWidth}
@@ -75,6 +80,7 @@ const TodoListScreen = () => {
           odotList={todoItem.todos}
         />
         <TodoList
+          setOdotList={setTodoItem}
           odotList={todoItem.todos}
           fullData={fullData}
           thisYear={thisYear}
