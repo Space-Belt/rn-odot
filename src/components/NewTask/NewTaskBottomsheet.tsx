@@ -9,14 +9,17 @@ import {
   TouchableHighlight,
   View,
 } from 'react-native';
+import {useRecoilState} from 'recoil';
 import {getStorageData} from '../../lib/storage-helper';
 import {useBottomSheet} from '../../recoil/BottomSheetStore';
 import {useToast} from '../../recoil/ToastStore';
-import {IWholeTodoList} from '../../types/todos';
+import {todoList} from '../../recoil/Todo';
+import {ITodoItem, IWholeTodoList} from '../../types/todos';
 
 const NewTaskBottomsheet = () => {
   const {showToast} = useToast();
   const {hideBottomSheet} = useBottomSheet();
+  const [recoilTodo, setRecoilTodo] = useRecoilState(todoList);
 
   const [thisYear, setThisYear] = React.useState<string>('');
   const [thisMonth, setThitMonth] = React.useState<string>('');
@@ -42,6 +45,17 @@ const NewTaskBottomsheet = () => {
         }
 
         if (clonedData[thisYear][thisMonth][thisDay] !== undefined) {
+          let tempRecoilTodo: ITodoItem[] = [...recoilTodo.todos];
+          tempRecoilTodo.push({
+            todo: todo,
+            done: false,
+          });
+
+          setRecoilTodo({
+            fullDate: `${thisYear}/${thisMonth}/${thisDay}`,
+            todos: tempRecoilTodo,
+          });
+
           clonedData[thisYear][thisMonth][thisDay].push({
             todo: todo,
             done: false,
@@ -51,6 +65,7 @@ const NewTaskBottomsheet = () => {
           showToast('오늘할일을 꼭 마무리 하십쇼.', 'success');
           hideBottomSheet();
         } else {
+          let tempRecoilTodo: ITodoItem[] = [...recoilTodo.todos];
           clonedData[thisYear][thisMonth][thisDay] = [
             {todo: todo, done: false},
           ];
@@ -58,6 +73,11 @@ const NewTaskBottomsheet = () => {
           setTodo('');
           showToast('오늘 첫 할일 등록했습니다. 화이팅!!', 'success');
           hideBottomSheet();
+
+          setRecoilTodo({
+            fullDate: `${thisYear}/${thisMonth}/${thisDay}`,
+            todos: tempRecoilTodo,
+          });
         }
       } else {
         showToast('한글자 이상 부터 등록됩니다.', 'error');
@@ -97,22 +117,17 @@ const NewTaskBottomsheet = () => {
   }, []);
 
   React.useEffect(() => {
-    const getData = async () => {
-      let results = await getStorageData('date');
-
-      if (results !== null) {
-        setThisYear(results.year);
-        setThitMonth(results.month);
-        setThisDay(results.day);
-      } else {
-        setThisYear(moment().format('YYYY'));
-        setThitMonth(moment().format('MM'));
-        setThisDay(moment().format('DD'));
-      }
-    };
-
-    getData();
-  }, []);
+    if (recoilTodo.fullDate !== '') {
+      let [y, m, d] = recoilTodo.fullDate.split('/');
+      setThisYear(y);
+      setThitMonth(m);
+      setThisDay(d);
+    } else {
+      setThisYear(moment().format('YYYY'));
+      setThitMonth(moment().format('MM'));
+      setThisDay(moment().format('DD'));
+    }
+  }, [recoilTodo]);
 
   return (
     <View style={styles.wrapper}>

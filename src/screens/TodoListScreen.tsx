@@ -13,6 +13,7 @@ import {useIsFocused} from '@react-navigation/native';
 import MainHeader from '../components/Headers/MainHeader';
 import NewTaskBottomsheet from '../components/NewTask/NewTaskBottomsheet';
 
+import moment from 'moment';
 import {useRecoilState} from 'recoil';
 import TodoList from '../components/Todo/List/TodoList';
 import ProgressBar from '../components/Todo/Progress/ProgressBar';
@@ -31,7 +32,10 @@ const TodoListScreen = () => {
   // const todoItem = useRecoilValue(todoList);
   const [todoItem, setTodoItem] = useRecoilState(todoList);
 
-  const [thisYear, thisMonth, thisDay] = todoItem.fullDate.split('/');
+  const [thisYear, thisMonth, thisDay] =
+    todoItem.fullDate !== ''
+      ? todoItem.fullDate.split('/')
+      : [moment().format('YYYY'), moment().format('MM'), moment().format('DD')];
 
   const [fullData, setFullData] = React.useState<IWholeTodoList>({});
 
@@ -69,7 +73,7 @@ const TodoListScreen = () => {
         <View style={styles.dateWrapper}>
           <Text style={styles.dateText}>
             {todoItem.fullDate === ''
-              ? `${thisYear}/${thisMonth}/${thisYear}`
+              ? `${thisYear}/${thisMonth}/${thisDay}`
               : todoItem.fullDate}
           </Text>
         </View>
