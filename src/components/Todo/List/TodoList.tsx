@@ -68,7 +68,7 @@ const TodoList = ({
 
   return (
     <ScrollView style={styles.scrollViewStyle}>
-      {odotList.map((todo, i) => (
+      {odotList?.map((todo, i) => (
         <TodoRenderingList
           key={i}
           handleDeleteTodoList={handleDeleteTodoList}

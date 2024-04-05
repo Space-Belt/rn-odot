@@ -43,9 +43,9 @@ const TodoListScreen = () => {
     showBottomSheet(<NewTaskBottomsheet />);
   };
 
-  const totalCount = todoItem ? todoItem.todos.length : 1;
+  const totalCount = todoItem.todos ? todoItem?.todos?.length : 1;
   const doneCount = todoItem
-    ? todoItem.todos.filter(list => list.done).length
+    ? todoItem.todos?.filter(list => list.done).length
     : 1;
   const percentageWidth = (doneCount / totalCount) * 100;
 

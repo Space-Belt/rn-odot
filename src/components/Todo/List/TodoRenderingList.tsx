@@ -1,4 +1,4 @@
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import React, {useState} from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
@@ -114,14 +114,32 @@ const TodoRenderingList = ({
       }
     })
     .onEnd(event => {
-      if (event.absoluteX < 25) {
+      if (event.absoluteX < 15) {
+        translateX.value = withTiming(-1000);
+        tempDeleteBtnWidth.value = 0;
+        deletBtnOpacity.value = 0;
+        deleteBtnWidth.value = 0;
         runOnJS(handleDeleteTodoList)(index);
       }
+      //  else {
+      //   tempDeleteBtnWidth.value = 0;
+      //   deletBtnOpacity.value = 1;
+      //   translateX.value = -100;
+      //   deleteBtnWidth.value = 100;
+      // }
     });
+
+  const isFocus = useIsFocused();
+  React.useEffect(() => {
+    tempDeleteBtnWidth.value = 0;
+    deletBtnOpacity.value = 0;
+    translateX.value = 0;
+    deleteBtnWidth.value = 0;
+  }, [isFocus]);
 
   return (
     <GestureDetector gesture={panGestureEvent}>
-      <View>
+      <View style={styles.wrapper}>
         <TouchableOpacity
           onPress={() => handleCheckTodoList(index)}
           key={`todos-${index}`}>
@@ -168,6 +186,9 @@ const TodoRenderingList = ({
 export default TodoRenderingList;
 
 const styles = StyleSheet.create({
+  wrapper: {
+    width: '100%',
+  },
   todo: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -45,7 +45,8 @@ const NewTaskBottomsheet = () => {
         }
 
         if (clonedData[thisYear][thisMonth][thisDay] !== undefined) {
-          let tempRecoilTodo: ITodoItem[] = [...recoilTodo.todos];
+          let tempRecoilTodo: ITodoItem[] =
+            recoilTodo.todos !== undefined ? [...recoilTodo.todos] : [];
           tempRecoilTodo.push({
             todo: todo,
             done: false,
@@ -65,7 +66,8 @@ const NewTaskBottomsheet = () => {
           showToast('오늘할일을 꼭 마무리 하십쇼.', 'success');
           hideBottomSheet();
         } else {
-          let tempRecoilTodo: ITodoItem[] = [...recoilTodo.todos];
+          let tempRecoilTodo: ITodoItem[] =
+            recoilTodo.todos !== undefined ? [...recoilTodo.todos] : [];
           clonedData[thisYear][thisMonth][thisDay] = [
             {todo: todo, done: false},
           ];
@@ -107,6 +109,7 @@ const NewTaskBottomsheet = () => {
       let results = await getStorageData('todos');
 
       if (results === null) {
+        console.log(results);
         setTodoGroup({});
       } else {
         setTodoGroup(results);
