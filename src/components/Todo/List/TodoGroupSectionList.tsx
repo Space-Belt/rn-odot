@@ -82,13 +82,14 @@ const TodoGroupSectionList = ({item, handleDeleteItem}: props) => {
         } else {
           deleteBtnWidth.value = withTiming(
             tempDeleteBtnWidth.value - event.translationX,
-            {},
+            {duration: 100},
             () => {
               deleteBtnWidth.value > 40 && runOnJS(setClicked)(true);
             },
           );
           translateX.value = withTiming(
             tempTranslateX.value + event.translationX,
+            {duration: 100},
           );
           if (event.translationX > layout.width / 2) {
             runOnJS(setClicked)(false);
