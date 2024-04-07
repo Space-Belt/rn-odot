@@ -11,6 +11,9 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import ReusableHeader from '../components/Headers/ReusableHeader';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
+import frame from '../assets/images/Frame.png';
+
 import {getStorageData} from '../lib/storage-helper';
 
 export interface Item {
@@ -29,23 +32,6 @@ export interface SectionType {
   data: ItemType[];
 }
 
-// const DUMMY_SECTION_DATA: SectionType[] = [
-//   {title: '2024/03/31', data: [{count: '10', fullDate: 'asdfasdf'}]},
-//   {title: '2024/04/01', data: [{count: '10', fullDate: 'asdfasdf123'}]},
-//   {title: '2024/04/32', data: [{count: '10', fullDate: 'asdfasdf456'}]},
-//   {
-//     title: '2024/04/32',
-//     data: [
-//       {count: '10', fullDate: 'asdfasdf456'},
-//       {count: '10', fullDate: '미ㅏ얼먇'},
-//       {count: '10', fullDate: 'asldifjawlidfjv'},
-//       {count: '10', fullDate: 'eibvalsoiem'},
-//       {count: '10', fullDate: 'asldifjawlidawdf'},
-//       {count: '10', fullDate: 'a9188vh8d'},
-//     ],
-//   },
-// ];
-
 const TodoListGroupScreen = () => {
   const navigation = useNavigation();
 
@@ -59,15 +45,6 @@ const TodoListGroupScreen = () => {
   };
 
   const handleAddTask = () => {
-    // AsyncStorage.setItem(
-    //   'date',
-    //   JSON.stringify({
-    //     year: year,
-    //     month: month,
-    //     day: date,
-    //   }),
-    // );
-    // navigation.navigate('AddTaskScreen');
     navigation.navigate('ListSwipeScreen');
   };
 
@@ -144,6 +121,13 @@ const TodoListGroupScreen = () => {
         )) {
           for (const [todo, todos] of Object.entries(
             tempDays as {[key: string]: {done: boolean; todo: string}[]},
+
+//       let processedData = [];
+//       if (results !== null) {
+//         for (const [tempYear, tempMonths] of Object.entries(results)) {
+//           for (const [tempMonth, tempDays] of Object.entries(
+//             tempMonths as Object,
+
           )) {
             let dateInfo = `${tempYear}/${tempMonth}/${todo}`;
             let tempData: {done: boolean; todo: string}[] = todos;
