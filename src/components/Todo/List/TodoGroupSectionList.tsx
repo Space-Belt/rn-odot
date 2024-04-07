@@ -71,7 +71,7 @@ const TodoGroupSectionList = ({item, handleDeleteItem}: props) => {
       if (translateX.value === 0 && event.translationX > 0) {
         return;
       } else {
-        console.log(event.translationX);
+
         if (tempTranslateX.value + event.translationX > 0) {
           deleteBtnWidth.value = withTiming(0, {}, () => {
             runOnJS(setClicked)(false);

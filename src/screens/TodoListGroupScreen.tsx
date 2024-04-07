@@ -5,6 +5,10 @@ import {SectionList, StyleSheet, Text, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import ReusableHeader from '../components/Headers/ReusableHeader';
 import TodoGroupSectionList from '../components/Todo/List/TodoGroupSectionList';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
+import frame from '../assets/images/Frame.png';
+
+
 import {getStorageData} from '../lib/storage-helper';
 import {ITodoItem, IWholeTodoList} from '../types/todos';
 
@@ -94,6 +98,13 @@ const TodoListGroupScreen = () => {
           console.log(tempDays);
           for (const [todo, todos] of Object.entries(
             tempDays as {[key: string]: {done: boolean; todo: string}[]},
+
+//       let processedData = [];
+//       if (results !== null) {
+//         for (const [tempYear, tempMonths] of Object.entries(results)) {
+//           for (const [tempMonth, tempDays] of Object.entries(
+//             tempMonths as Object,
+
           )) {
             let dateInfo = `${tempYear}/${tempMonth}/${todo}`;
             let tempData: {done: boolean; todo: string}[] = [...todos];
