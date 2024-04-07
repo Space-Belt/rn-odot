@@ -1,7 +1,10 @@
 import {atom, useRecoilState} from 'recoil';
 import {ITodoItem} from '../types/todos';
 
+
 export interface ITodoItemList {
+
+
   fullDate: string;
   todos: ITodoItem[];
 }

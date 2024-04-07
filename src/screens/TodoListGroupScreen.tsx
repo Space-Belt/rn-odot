@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {SectionList, StyleSheet, Text, View} from 'react-native';
@@ -11,6 +10,8 @@ import frame from '../assets/images/Frame.png';
 
 import {getStorageData} from '../lib/storage-helper';
 import {ITodoItem, IWholeTodoList} from '../types/todos';
+import {useTodoList} from '../recoil/Todo';
+
 
 export interface Item {
   id: number;
@@ -32,6 +33,9 @@ export interface SectionType {
 const TodoListGroupScreen = () => {
   const navigation = useNavigation();
 
+
+  const {setTodos} = useTodoList();
+
   const [sections, setSections] = useState<SectionType[]>([]);
   const [fullData, setFullData] = React.useState<IWholeTodoList>({});
 
@@ -51,6 +55,7 @@ const TodoListGroupScreen = () => {
     );
   };
 
+
   const handleDeleteItem = (date: string) => {
     let clonedData = {...fullData};
     let [yyyy, mm, dd] = date.split('/');
@@ -58,6 +63,11 @@ const TodoListGroupScreen = () => {
     setFullData(clonedData);
     makeSectionFunction(clonedData);
     AsyncStorage.setItem('todos', JSON.stringify(clonedData));
+
+  const handleListClicked = (item: IItemType) => {
+    setTodos(item.fullDate, item.todos);
+    navigation.navigate('TodoListScreen');
+
   };
 
   const keyExtractor = (item: IItemType) =>
@@ -74,7 +84,6 @@ const TodoListGroupScreen = () => {
 
     datas.forEach(item => {
       const firstLetter = item.fullDate.slice(0, 7);
-
       if (!nameObject[firstLetter]) {
         nameObject[firstLetter] = [item];
       } else {
@@ -131,6 +140,7 @@ const TodoListGroupScreen = () => {
     setFullData(results);
 
     makeSectionFunction(results);
+
   }, []);
 
   useEffect(() => {

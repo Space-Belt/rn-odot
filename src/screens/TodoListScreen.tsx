@@ -17,6 +17,7 @@ import NewTaskBottomsheet from '../components/NewTask/NewTaskBottomsheet';
 
 import moment from 'moment';
 import {useRecoilState} from 'recoil';
+import {useRecoilValue} from 'recoil';
 import TodoList from '../components/Todo/List/TodoList';
 import ProgressBar from '../components/Todo/Progress/ProgressBar';
 import {getStorageData} from '../lib/storage-helper';
@@ -41,6 +42,7 @@ const TodoListScreen = () => {
   const {showBottomSheet} = useBottomSheet();
 
   const {isVisible} = useToast();
+
   // const todoItem = useRecoilValue(todoList);
   const [todoItem, setTodoItem] = useRecoilState(todoList);
 
@@ -48,6 +50,8 @@ const TodoListScreen = () => {
     todoItem.fullDate !== ''
       ? todoItem.fullDate.split('/')
       : [moment().format('YYYY'), moment().format('MM'), moment().format('DD')];
+  const todoItem = useRecoilValue(todoList);
+
 
   const [fullData, setFullData] = React.useState<IWholeTodoList>({});
 
@@ -55,9 +59,11 @@ const TodoListScreen = () => {
     showBottomSheet(<NewTaskBottomsheet />);
   };
 
+
   const totalCount = todoItem.todos ? todoItem?.todos?.length : 1;
   const doneCount = todoItem
     ? todoItem.todos?.filter(list => list.done).length
+
     : 1;
   const percentageWidth = (doneCount / totalCount) * 100;
 
@@ -107,6 +113,7 @@ const TodoListScreen = () => {
               ? `${thisYear}/${thisMonth}/${thisDay}`
               : todoItem.fullDate}
           </Text>
+
         </View>
         <ProgressBar
           percentageWidth={percentageWidth}

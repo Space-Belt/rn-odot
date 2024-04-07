@@ -1,9 +1,20 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from 'react';
+
 import {ScrollView, StyleSheet} from 'react-native';
 import {Gesture} from 'react-native-gesture-handler';
 import {SetterOrUpdater} from 'recoil';
 import {ITodoItemList, useTodoList} from '../../../recoil/Todo';
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import {useTodoList} from '../../../recoil/Todo';
+
 import {ITodoItem, IWholeTodoList} from '../../../types/todos';
 import TodoRenderingList from './TodoRenderingList';
 
@@ -17,8 +28,8 @@ import {ITodoItem, IWholeTodoList} from '../../../types/todos';
 import TodoRenderingList from './TodoRenderingList';
 
 type props = {
-  setOdotList: SetterOrUpdater<ITodoItemList>;
   odotList: ITodoItem[];
+  setOdotList: Dispatch<SetStateAction<ITodoItem[]>>;
   fullData: IWholeTodoList;
   thisYear: string;
   thisMonth: string;
@@ -46,7 +57,6 @@ const TodoList = ({
   const handleCheckTodoList = (i: number) => {
     let clonedFullData: IWholeTodoList = fullData;
     let clonedOdotList: ITodoItem[] = [...odotList];
-    
     clonedOdotList[i] = {
       done: !clonedOdotList[i].done,
       todo: clonedOdotList[i].todo,
