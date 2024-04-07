@@ -69,7 +69,7 @@ const TodoListGroupScreen = () => {
 
   const renderSectionHeader = ({section}: {section: any}) => {
     return (
-      <View>
+      <View style={styles.sectionHeader}>
         <Text>{section.title}</Text>
       </View>
     );
@@ -252,6 +252,9 @@ const styles = StyleSheet.create({
   dateText: {
     fontWeight: '600',
     fontSize: 16,
+  },
+  sectionHeader: {
+    backgroundColor: '#F2F2F2',
   },
   sectionStyle: {gap: 10},
   countText: {

@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useNavigation, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {
   Image,
@@ -14,16 +13,13 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import arrow from '../assets/images/arrow.png';
 
 import moment from 'moment';
-import {TodoItem, WholeTodoList} from '../types/todos';
+import {WholeTodoList} from '../types/todos';
 import AddTaskHeader from '../components/Headers/AddTaskHeader';
 import {getAllKeys, getStorageData} from '../lib/storage-helper';
 import {useToast} from '../recoil/ToastStore';
-import ToastMessage from '../components/toastMessage/ToastMessage';
 
 const AddTaskScreen = () => {
   const {showToast} = useToast();
-
-  const navigation = useNavigation();
 
   const [thisYear, setThisYear] = useState<string>('');
   const [thisMonth, setThitMonth] = useState<string>('');
@@ -122,7 +118,7 @@ const AddTaskScreen = () => {
     <SafeAreaView style={styles.safeWrapper}>
       <View style={styles.wrapper}>
         <AddTaskHeader mb={20} title={'New Task'} />
-        {/* 영역 */}
+
         <TextInput
           value={todo}
           onChangeText={(text: string) => handleChangeValue(text)}

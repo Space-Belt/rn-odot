@@ -10,11 +10,19 @@ import {
   View,
 } from 'react-native';
 
+
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import moment from 'moment';
 import MainHeader from '../components/Headers/MainHeader';
 import {getStorageData} from '../lib/storage-helper';
+
+import {useBottomSheet} from '../recoil/BottomSheetStore';
+import NewTaskBottomsheet from '../components/NewTask/NewTaskBottomsheet';
+import {useToast} from '../recoil/ToastStore';
+import ProgressBar from '../components/\bTodo/Progress/ProgressBar';
+
 import {TodoItem, WholeTodoList} from '../types/todos';
 
 const defaultParams = {
@@ -23,9 +31,13 @@ const defaultParams = {
   selectedDate: '',
 };
 
+
 const TodoListScreen = () => {
-  const navigation = useNavigation();
   const isFocused = useIsFocused();
+
+  const {showBottomSheet} = useBottomSheet();
+
+  const {isVisible} = useToast();
 
   const [thisYear, setThisYear] = useState<string>('');
   const [thisMonth, setThitMonth] = useState<string>('');
@@ -45,7 +57,7 @@ const TodoListScreen = () => {
   };
 
   const handlePlusClick = () => {
-    navigation.navigate('AddTaskScreen');
+    showBottomSheet(<NewTaskBottomsheet />);
   };
 
   const renderList = (todo: TodoItem, i: number) => {
@@ -77,11 +89,11 @@ const TodoListScreen = () => {
     );
   };
 
-  const totalCount = odotList.length;
-  const doneCount = odotList.filter(list => list.done).length;
-  const percentage = (doneCount / totalCount) * 100;
+  const totalCount = odotList ? odotList.length : 1;
+  const doneCount = odotList ? odotList.filter(list => list.done).length : 1;
+  const percentageWidth = (doneCount / totalCount) * 100;
 
-  const percentStyle = [styles.percentage, {width: `${percentage}%`}];
+  const percentStyle = [styles.percentage, {width: `${percentageWidth}%`}];
 
   const getDatas = async (y: string, m: string, d: string) => {
     let results = await getStorageData('todos');
@@ -110,10 +122,10 @@ const TodoListScreen = () => {
       }
       getDatas(results.year, results.month, results.day);
     };
-    if (isFocused) {
+    if (isFocused || isVisible === true) {
       getData();
     }
-  }, [isFocused]);
+  }, [isFocused, isVisible]);
 
   return (
     <View style={styles.wrapper}>
@@ -121,32 +133,21 @@ const TodoListScreen = () => {
         {/* 앱에서는 네비게이션이함 nav */}
         <MainHeader />
         <View style={styles.dateWrapper}>
-          <Text>
+          <Text style={styles.dateText}>
             {thisYear}/{thisMonth}/{thisDay}
           </Text>
         </View>
-        <View style={styles.textInputArea}>
-          <Text style={styles.progressTextStyle}>progress</Text>
-          <View style={styles.percentageArea}>
-            <View style={styles.emptyPercentage}>
-              <View style={percentStyle} />
-            </View>
-          </View>
-          <View>
-            <Text
-              style={styles.countText}>{`${doneCount} / ${totalCount}`}</Text>
-          </View>
-        </View>
+        <ProgressBar
+          percentageWidth={percentageWidth}
+          doneCount={doneCount}
+          totalCount={totalCount}
+          odotList={odotList}
+        />
 
         {/* 투두 부분 */}
         <ScrollView style={styles.scrollViewStyle}>
-          {odotList.length > 0 ? (
-            odotList.map((el: TodoItem, i: number) => renderList(el, i))
-          ) : (
-            <View style={styles.emptyView}>
-              <Text>할일을 등록해주세요!</Text>
-            </View>
-          )}
+          {odotList?.length > 0 &&
+            odotList.map((el: TodoItem, i: number) => renderList(el, i))}
         </ScrollView>
         <TouchableHighlight
           onPress={handlePlusClick}
@@ -172,7 +173,6 @@ const styles = StyleSheet.create({
   },
   emptyView: {
     flex: 1,
-    height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   todoStyle: {marginLeft: 5},
-  scrollViewStyle: {paddingHorizontal: 25},
+  scrollViewStyle: {flex: 1, paddingHorizontal: 25},
 
   checkImg: {
     width: 25,
@@ -250,5 +250,24 @@ const styles = StyleSheet.create({
   },
   dateWrapper: {
     paddingHorizontal: 20,
+    fontWeight: '700',
+    alignItems: 'center',
+  },
+  dateText: {
+    width: 100,
+    color: '#333',
+    textAlign: 'center',
+    paddingVertical: 5,
+    marginBottom: 5,
+    fontWeight: '700',
+    elevation: 5,
+    // iOS
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.4,
+    shadowRadius: 3.84,
   },
 });

@@ -41,5 +41,5 @@ export const useToast = () => {
     }, 2300);
   };
 
-  return {showToast};
+  return {showToast, isVisible};
 };
