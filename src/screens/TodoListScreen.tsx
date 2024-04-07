@@ -8,7 +8,10 @@ import {
   View,
 } from 'react-native';
 
-import {useIsFocused} from '@react-navigation/native';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
+import moment from 'moment';
 
 import MainHeader from '../components/Headers/MainHeader';
 import NewTaskBottomsheet from '../components/NewTask/NewTaskBottomsheet';
@@ -17,10 +20,20 @@ import {useRecoilValue} from 'recoil';
 import TodoList from '../components/Todo/List/TodoList';
 import ProgressBar from '../components/Todo/Progress/ProgressBar';
 import {getStorageData} from '../lib/storage-helper';
+
 import {useBottomSheet} from '../recoil/BottomSheetStore';
 import {useToast} from '../recoil/ToastStore';
 import {todoList} from '../recoil/Todo';
 import {IWholeTodoList} from '../types/todos';
+
+import {TodoItem, WholeTodoList} from '../types/todos';
+
+const defaultParams = {
+  selectedYear: '',
+  selectedMonth: '',
+  selectedDate: '',
+};
+
 
 const TodoListScreen = () => {
   const isFocused = useIsFocused();
@@ -55,6 +68,22 @@ const TodoListScreen = () => {
   };
 
   useEffect(() => {
+
+    const getData = async () => {
+      let results = await getStorageData('date');
+
+      if (results !== null) {
+        setThisYear(results.year);
+        setThitMonth(results.month);
+        setThisDay(results.day);
+      } else {
+        setThisYear(moment().format('YYYY'));
+        setThitMonth(moment().format('MM'));
+        setThisDay(moment().format('DD'));
+      }
+      getDatas(results.year, results.month, results.day);
+    };
+
     if (isFocused || isVisible === true) {
       getDatas();
     }

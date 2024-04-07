@@ -1,10 +1,10 @@
 import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import Animated, {FadeIn, FadeOut} from 'react-native-reanimated';
-import {toastContent, toastVisibility} from '../../recoil/ToastStore';
 import {useRecoilValue} from 'recoil';
 import Error from '../../assets/images/error.svg';
 import Success from '../../assets/images/success.svg';
+import {toastContent, toastVisibility} from '../../recoil/ToastStore';
 
 const DEFAULT_WIDTH = 350;
 
@@ -12,19 +12,8 @@ const ToastMessage = () => {
   const isToastOn = useRecoilValue(toastVisibility);
   const toastMessage = useRecoilValue(toastContent);
 
-  const shadowStyle = {
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1,
-    elevation: 5,
-  };
-
   return (
-    <View style={[styles.wrapper, isToastOn ? shadowStyle : {}]}>
+    <View style={[styles.wrapper, isToastOn ? styles.shadowStyle : {}]}>
       {isToastOn && (
         <Animated.View
           style={[styles.toastWrapper]}
@@ -71,5 +60,15 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontSize: 12,
     fontWeight: '500',
+  },
+  shadowStyle: {
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1,
+    elevation: 5,
   },
 });
