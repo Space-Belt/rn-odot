@@ -1,5 +1,5 @@
-import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
+import React from 'react';
 import Animated, {FadeIn, FadeOut} from 'react-native-reanimated';
 import {useRecoilValue} from 'recoil';
 import Error from '../../assets/images/error.svg';
@@ -36,7 +36,7 @@ export default ToastMessage;
 const styles = StyleSheet.create({
   wrapper: {
     position: 'absolute',
-    top: 20,
+    top: 25,
     left: '50%',
     backgroundColor: '#fefefe',
     transform: [{translateX: -DEFAULT_WIDTH / 2}],

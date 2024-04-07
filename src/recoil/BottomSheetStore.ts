@@ -1,5 +1,5 @@
-import {atom, useRecoilState} from 'recoil';
 import React from 'react';
+import {atom, useRecoilState} from 'recoil';
 
 export interface IBottomSheetVisible {
   isBottomSheetVisible: boolean;
@@ -34,8 +34,10 @@ export const useBottomSheet = () => {
   };
 
   const hideBottomSheet = () => {
-    setContent({content: null});
-    setIsVisible({isBottomSheetVisible: false});
+    setIsVisible(prev => ({...prev, isBottomSheetVisible: false}));
+    setTimeout(() => {
+      setContent(prev => ({...prev, content: null}));
+    }, 300);
   };
 
   return {

@@ -2,8 +2,6 @@ import {
   BackHandler,
   Dimensions,
   StyleSheet,
-  Text,
-  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
@@ -15,19 +13,16 @@ import {
   useBottomSheet,
 } from '../../recoil/BottomSheetStore';
 import Animated, {
-  BounceIn,
-  BounceInUp,
-  BounceOut,
-  EntryExitTransition,
   FadeIn,
   FadeOut,
-  JumpingTransition,
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
+  withSpring,
   withTiming,
 } from 'react-native-reanimated';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
+import {getStatusBarHeight} from 'react-native-safearea-height';
 
 const screenHeight = Dimensions.get('window').height;
 const bottomSheetHeight = screenHeight * 0.4;
@@ -35,59 +30,74 @@ const bottomSheetHeight = screenHeight * 0.4;
 const BottomSheet = () => {
   const content = useRecoilValue(bottomSheetContent);
   const [isVisible, setIsVisible] = useRecoilState(bottomSheetVisibleState);
+  const {hideBottomSheet} = useBottomSheet();
+
+  const statusBarHeight = getStatusBarHeight(true);
 
   const [isOn, setIsOn] = React.useState<boolean>(false);
 
-  // const bottom = useSharedValue(0);
-  const top = useSharedValue(screenHeight);
-  const containerHeight = useSharedValue(bottomSheetHeight);
-
-  const {hideBottomSheet} = useBottomSheet();
+  const translateY = useSharedValue(bottomSheetHeight);
+  const sheetHeight = useSharedValue(bottomSheetHeight);
 
   const handleBackgroundClick = () => {
     hideBottomSheet();
   };
 
   const sheetAnimatedStyle = useAnimatedStyle(() => {
+    if (bottomSheetHeight * 0.7 > sheetHeight.value) {
+      runOnJS(setIsVisible)({isBottomSheetVisible: false});
+      // translateY.value = bottomSheetHeight;
+      // sheetHeight.value = bottomSheetHeight;
+    } else if (screenHeight <= sheetHeight.value) {
+      console.log(statusBarHeight);
+      sheetHeight.value = withSpring(screenHeight - statusBarHeight);
+
+      return {
+        transform: [{translateY: translateY.value}],
+        height: sheetHeight.value,
+      };
+    }
     return {
-      top: top.value,
-      height: containerHeight.value,
+      transform: [{translateY: translateY.value}],
+      height: sheetHeight.value,
     };
   });
 
-  const startY = useSharedValue(0);
+  const startHeight = useSharedValue(0);
+
   const panGestureEvent = Gesture.Pan()
     .onStart(() => {
-      // 처음의 값 저장
-      startY.value = containerHeight.value;
+      startHeight.value = sheetHeight.value;
     })
     .onUpdate(event => {
-      // 찍어보기
-      console.log(event.translationY);
-
-      // let tempValue = top.value + event.translationY;
-      // let temp = containerHeight.value - event.translationY;
-      // top.value = withTiming(tempValue);
-      // containerHeight.value = withTiming(startY.value + -event.translationY);
-      containerHeight.value = withTiming(startY.value + -event.translationY);
+      sheetHeight.value = startHeight.value - event.translationY;
     });
 
   React.useEffect(() => {
     if (isVisible.isBottomSheetVisible) {
       setIsOn(true);
-      top.value = withTiming(screenHeight - bottomSheetHeight, {
-        duration: 400,
+      translateY.value = withTiming(0, {
+        duration: 500,
       });
     } else {
-      top.value = withTiming(screenHeight, {
-        duration: 400,
+      translateY.value = withTiming(screenHeight, {
+        duration: 500,
       });
       const timeout = setTimeout(() => {
         setIsOn(false);
-      }, 400);
-      return () => clearTimeout(timeout);
+      }, 500);
+      return () => {
+        clearTimeout(timeout);
+        translateY.value = bottomSheetHeight;
+        sheetHeight.value = bottomSheetHeight;
+      };
     }
   }, [isVisible.isBottomSheetVisible]);
+
+  React.useEffect(() => {
+    console.log('dfdfdfdfdf');
+    console.log(sheetHeight.value);
+  }, [sheetHeight.value]);
 
   React.useEffect(() => {
     const handlePressBackButton = () => {
@@ -107,8 +117,8 @@ const BottomSheet = () => {
     <>
       {isVisible.isBottomSheetVisible && (
         <Animated.View
-          entering={FadeIn.duration(1000)}
-          exiting={FadeOut.duration(1000)}
+          entering={FadeIn.duration(300)}
+          exiting={FadeOut.duration(300)}
           style={styles.backgroundWrapper}>
           <TouchableWithoutFeedback onPress={handleBackgroundClick}>
             <View style={styles.overlay} />
@@ -116,12 +126,15 @@ const BottomSheet = () => {
         </Animated.View>
       )}
       {isOn && (
-        <Animated.View style={[styles.bottomSheetWrapper, sheetAnimatedStyle]}>
-          <GestureDetector gesture={panGestureEvent}>
-            <View style={styles.gestureBar} />
-          </GestureDetector>
-          {content.content}
-        </Animated.View>
+        <GestureDetector gesture={panGestureEvent}>
+          <Animated.View
+            style={[styles.bottomSheetWrapper, sheetAnimatedStyle]}>
+            <View style={styles.gestureBarWrapper}>
+              <View style={styles.gestureBar} />
+            </View>
+            {content.content}
+          </Animated.View>
+        </GestureDetector>
       )}
     </>
   );
@@ -141,24 +154,28 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   bottomSheetWrapper: {
-    height: bottomSheetHeight,
     width: '100%',
     position: 'absolute',
-    backgroundColor: 'white',
+    bottom: 0,
+    backgroundColor: '#fff',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 25,
     paddingVertical: 25,
     zIndex: 10,
   },
+  gestureBarWrapper: {
+    left: 25,
+    width: '100%',
+    height: 15,
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   gestureBar: {
     width: 25,
-    height: 4,
+    height: 7,
     backgroundColor: '#C1C1C1',
     borderRadius: 2,
-    position: 'absolute',
-    top: 2,
-    left: '50%',
-    transform: [{translateX: 25 / 2}],
   },
 });

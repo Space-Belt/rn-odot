@@ -1,32 +1,32 @@
-export interface TodoItem {
+export interface IITodoItem {
   todo: string;
   done: boolean;
 }
 
-export interface DayTodoList {
-  [key: string]: TodoItem[];
+export interface IDayTodoList {
+  [key: string]: ITodoItem[];
 }
 
-export interface MonthTodoList {
+export interface IMonthTodoList {
   [key: string]: DayTodoList;
 }
 
-export interface YearTodoList {
+export interface IYearTodoList {
   [key: string]: MonthTodoList;
 }
 
-export interface WholeTodoList {
+export interface IWholeTodoList {
   [year: string]: {
     [month: string]: {
-      [date: string]: TodoItem[];
+      [date: string]: ITodoItem[];
     };
   };
 }
 
 export interface TodoGroup {
-  [key: string]: TodoList;
+  [key: string]: ITodoList;
 }
 
-export interface TodoList {
-  [key: string]: TodoItem[];
+export interface ITodoList {
+  [key: string]: ITodoItem[];
 }

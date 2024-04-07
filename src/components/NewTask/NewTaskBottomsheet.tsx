@@ -8,13 +8,15 @@ import {
   Text,
   TextInput,
   TouchableHighlight,
-  TouchableNativeFeedback,
   View,
 } from 'react-native';
-import React from 'react';
-import {useToast} from '../../recoil/ToastStore';
 import {getStorageData} from '../../lib/storage-helper';
-import moment from 'moment';
+
+import {useBottomSheet} from '../../recoil/BottomSheetStore';
+import {useToast} from '../../recoil/ToastStore';
+import {IWholeTodoList} from '../../types/todos';
+
+
 import {WholeTodoList} from '../../types/todos';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -24,6 +26,7 @@ import {useBottomSheet} from '../../recoil/BottomSheetStore';
 import {useToast} from '../../recoil/ToastStore';
 import {todoList} from '../../recoil/Todo';
 import {ITodoItem, IWholeTodoList} from '../../types/todos';
+
 
 
 const NewTaskBottomsheet = () => {
@@ -37,12 +40,12 @@ const NewTaskBottomsheet = () => {
   const [thisMonth, setThitMonth] = React.useState<string>('');
   const [thisDay, setThisDay] = React.useState<string>('');
 
-
   const [todoGroup, setTodoGroup] = React.useState<IWholeTodoList>({});
 
   const [todo, setTodo] = React.useState<string>('');
 
   const addTodoList = () => {
+
 
     let clonedData: IWholeTodoList = todoGroup;
 
@@ -79,9 +82,7 @@ const NewTaskBottomsheet = () => {
           });
           AsyncStorage.setItem('todos', JSON.stringify(clonedData));
           setTodo('');
-
-          
-          showToast('오늘할일을 꼭 마무리 하십쇼.', 'dkdk', 'success');
+          showToast('오늘할일을 꼭 마무리 하십쇼.', 'success');
           hideBottomSheet();
         } else {
 
@@ -96,6 +97,11 @@ const NewTaskBottomsheet = () => {
           ];
           AsyncStorage.setItem('todos', JSON.stringify(clonedData));
           setTodo('');
+          showToast('오늘 첫 할일 등록했습니다. 화이팅!!', 'success');
+          hideBottomSheet();
+        }
+      } else {
+        showToast('한글자 이상 부터 등록됩니다.', 'error');
           
           showToast('오늘 첫 할일 등록했습니다. 화이팅!!', 'dkdk', 'success');
           hideBottomSheet();
@@ -126,11 +132,7 @@ const NewTaskBottomsheet = () => {
       ];
       AsyncStorage.setItem('todos', JSON.stringify(clonedData));
       setTodo('');
-
-      showToast('할일 등록 성공!! 오늘도 화이팅', 'dkdk', 'success');
-
       showToast('할일 등록 성공!! 오늘도 화이팅', 'success');
-
       hideBottomSheet();
     }
   };
@@ -194,10 +196,8 @@ const NewTaskBottomsheet = () => {
           value={todo}
           onChangeText={handleChangeValue}
           placeholder={'tell me what you gonna do today!'}
-
           autoFocus
           textAlignVertical={Platform.OS === 'android' ? 'top' : 'center'}
-
         />
       </View>
       <TouchableHighlight style={styles.addTask} onPress={addTodoList}>

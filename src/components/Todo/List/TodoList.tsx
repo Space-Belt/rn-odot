@@ -1,4 +1,18 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, {Dispatch, SetStateAction} from 'react';
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import {ITodoItem, IWholeTodoList} from '../../../types/todos';
+
+type props = {
+  odotList: ITodoItem[];
+  setOdotList: Dispatch<SetStateAction<ITodoItem[]>>;
 import React from 'react';
 import {ScrollView, StyleSheet} from 'react-native';
 import {Gesture} from 'react-native-gesture-handler';
@@ -17,6 +31,8 @@ type props = {
 };
 
 const TodoList = ({
+  odotList,
+  fullData,
   setOdotList,
   odotList,
   fullData,
@@ -24,6 +40,11 @@ const TodoList = ({
   thisMonth,
   thisDay,
 }: props) => {
+  const handleCheckTodoList = (i: number) => {
+    let clonedFullData: IWholeTodoList = fullData;
+    let clonedOdotList: ITodoItem[] = [...odotList];
+    clonedOdotList[i].done = !clonedOdotList[i].done;
+    setOdotList(clonedOdotList);
   const {setTodos} = useTodoList();
 
   const handleCheckTodoList = (i: number) => {
@@ -38,6 +59,34 @@ const TodoList = ({
     AsyncStorage.setItem('todos', JSON.stringify(clonedFullData));
   };
 
+  return (
+    <ScrollView style={styles.scrollViewStyle}>
+      {odotList.map((todo, i) => (
+        <TouchableOpacity
+          onPress={() => handleCheckTodoList(i)}
+          key={`todos-${i}`}>
+          <View
+            style={[
+              styles.todo,
+              odotList.length - 1 === i ? {marginBottom: 10} : {},
+            ]}>
+            {todo.done !== undefined && todo.done !== false ? (
+              <Image
+                style={styles.checkImg}
+                source={require('../../../assets/images/checked.png')}
+              />
+            ) : (
+              <Image
+                style={styles.checkImg}
+                source={require('../../../assets/images/unchecked.png')}
+              />
+            )}
+            <View style={styles.todoStyle}>
+              <Text>{todo.todo}</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+        
   const handleDeleteTodoList = (listIndex: number) => {
     let clonedData = [...odotList];
     clonedData.splice(listIndex, 1);

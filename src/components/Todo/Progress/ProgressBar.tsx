@@ -1,18 +1,17 @@
-import {StyleSheet, Text, View, ViewStyle} from 'react-native';
 import React from 'react';
-import {TodoItem} from '../../../types/todos';
+import {StyleSheet, Text, View} from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-  withTiming,
 } from 'react-native-reanimated';
+import {ITodoItem} from '../../../types/todos';
 
 type Props = {
   percentageWidth: number;
   doneCount: number;
   totalCount: number;
-  odotList: TodoItem[];
+  odotList: ITodoItem[];
 };
 
 const ProgressBar = ({
