@@ -11,11 +11,12 @@ import {
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
-import moment from 'moment';
 
 import MainHeader from '../components/Headers/MainHeader';
 import NewTaskBottomsheet from '../components/NewTask/NewTaskBottomsheet';
 
+import moment from 'moment';
+import {useRecoilState} from 'recoil';
 import {useRecoilValue} from 'recoil';
 import TodoList from '../components/Todo/List/TodoList';
 import ProgressBar from '../components/Todo/Progress/ProgressBar';
@@ -41,9 +42,16 @@ const TodoListScreen = () => {
   const {showBottomSheet} = useBottomSheet();
 
   const {isVisible} = useToast();
+
+  // const todoItem = useRecoilValue(todoList);
+  const [todoItem, setTodoItem] = useRecoilState(todoList);
+
+  const [thisYear, thisMonth, thisDay] =
+    todoItem.fullDate !== ''
+      ? todoItem.fullDate.split('/')
+      : [moment().format('YYYY'), moment().format('MM'), moment().format('DD')];
   const todoItem = useRecoilValue(todoList);
 
-  const [thisYear, thisMonth, thisDay] = todoItem.fullDate.split('/');
 
   const [fullData, setFullData] = React.useState<IWholeTodoList>({});
 
@@ -51,9 +59,11 @@ const TodoListScreen = () => {
     showBottomSheet(<NewTaskBottomsheet />);
   };
 
-  const totalCount = todoItem ? todoItem.todos.length : 1;
+
+  const totalCount = todoItem.todos ? todoItem?.todos?.length : 1;
   const doneCount = todoItem
-    ? todoItem.todos.filter(list => list.done).length
+    ? todoItem.todos?.filter(list => list.done).length
+
     : 1;
   const percentageWidth = (doneCount / totalCount) * 100;
 
@@ -63,7 +73,10 @@ const TodoListScreen = () => {
     if (results === null) {
       return;
     }
-
+    setTodoItem({
+      fullDate: `${thisYear}/${thisMonth}/${thisDay}`,
+      todos: results[thisYear][thisMonth][thisDay],
+    });
     setFullData(results);
   };
 
@@ -95,7 +108,12 @@ const TodoListScreen = () => {
         {/* 앱에서는 네비게이션이함 nav */}
         <MainHeader />
         <View style={styles.dateWrapper}>
-          <Text style={styles.dateText}>{todoItem.fullDate}</Text>
+          <Text style={styles.dateText}>
+            {todoItem.fullDate === ''
+              ? `${thisYear}/${thisMonth}/${thisDay}`
+              : todoItem.fullDate}
+          </Text>
+
         </View>
         <ProgressBar
           percentageWidth={percentageWidth}
@@ -104,6 +122,7 @@ const TodoListScreen = () => {
           odotList={todoItem.todos}
         />
         <TodoList
+          setOdotList={setTodoItem}
           odotList={todoItem.todos}
           fullData={fullData}
           thisYear={thisYear}

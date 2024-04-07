@@ -1,20 +1,17 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import {
-  SectionList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {SectionList, StyleSheet, Text, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import ReusableHeader from '../components/Headers/ReusableHeader';
+import TodoGroupSectionList from '../components/Todo/List/TodoGroupSectionList';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import frame from '../assets/images/Frame.png';
 
+
 import {getStorageData} from '../lib/storage-helper';
+import {ITodoItem, IWholeTodoList} from '../types/todos';
 import {useTodoList} from '../recoil/Todo';
-import {ITodoItem} from '../types/todos';
+
 
 export interface Item {
   id: number;
@@ -36,11 +33,13 @@ export interface SectionType {
 const TodoListGroupScreen = () => {
   const navigation = useNavigation();
 
+
   const {setTodos} = useTodoList();
 
   const [sections, setSections] = useState<SectionType[]>([]);
+  const [fullData, setFullData] = React.useState<IWholeTodoList>({});
 
-  const handleClick = () => {
+  const handleBackClick = () => {
     navigation.goBack();
   };
 
@@ -56,9 +55,19 @@ const TodoListGroupScreen = () => {
     );
   };
 
+
+  const handleDeleteItem = (date: string) => {
+    let clonedData = {...fullData};
+    let [yyyy, mm, dd] = date.split('/');
+    delete clonedData[yyyy][mm][dd];
+    setFullData(clonedData);
+    makeSectionFunction(clonedData);
+    AsyncStorage.setItem('todos', JSON.stringify(clonedData));
+
   const handleListClicked = (item: IItemType) => {
     setTodos(item.fullDate, item.todos);
     navigation.navigate('TodoListScreen');
+
   };
 
   const keyExtractor = (item: IItemType) =>
@@ -66,15 +75,7 @@ const TodoListGroupScreen = () => {
 
   const renderItem = ({item}: {item: IItemType}) => {
     return (
-      <TouchableOpacity
-        onPress={() => handleListClicked(item)}
-        activeOpacity={0.7}
-        style={styles.listWrapper}>
-        <Text style={styles.dateText}>
-          {item.fullDate.slice(8, 10)}일 Todos
-        </Text>
-        <Text style={styles.countText}>{item.count}</Text>
-      </TouchableOpacity>
+      <TodoGroupSectionList item={item} handleDeleteItem={handleDeleteItem} />
     );
   };
 
@@ -83,15 +84,12 @@ const TodoListGroupScreen = () => {
 
     datas.forEach(item => {
       const firstLetter = item.fullDate.slice(0, 7);
-      console.log(firstLetter);
-
       if (!nameObject[firstLetter]) {
         nameObject[firstLetter] = [item];
       } else {
         nameObject[firstLetter]!.push(item);
       }
     });
-    console.log(nameObject);
 
     return Object.entries(nameObject).map(([title, data]) => ({
       title,
@@ -99,15 +97,14 @@ const TodoListGroupScreen = () => {
     }));
   };
 
-  const getData = React.useCallback(async () => {
-    let results = await getStorageData('todos');
-
+  const makeSectionFunction = (data: IWholeTodoList) => {
     let processedData = [];
-    if (results !== null) {
-      for (const [tempYear, tempMonths] of Object.entries(results)) {
+    if (data !== null) {
+      for (const [tempYear, tempMonths] of Object.entries(data)) {
         for (const [tempMonth, tempDays] of Object.entries(
           tempMonths as {[key: string]: any},
         )) {
+          console.log(tempDays);
           for (const [todo, todos] of Object.entries(
             tempDays as {[key: string]: {done: boolean; todo: string}[]},
 
@@ -119,11 +116,10 @@ const TodoListGroupScreen = () => {
 
           )) {
             let dateInfo = `${tempYear}/${tempMonth}/${todo}`;
-            let tempData: {done: boolean; todo: string}[] = todos;
+            let tempData: {done: boolean; todo: string}[] = [...todos];
             let doneCount = tempData.filter(
               tempEl => tempEl.done === true,
             ).length;
-
             processedData.push({
               fullDate: dateInfo,
               count: `${doneCount}/${tempData.length}`,
@@ -135,6 +131,16 @@ const TodoListGroupScreen = () => {
     }
 
     setSections(createSections(processedData.reverse()));
+  };
+
+  const getData = React.useCallback(async () => {
+    // clearStorageData();
+    let results = await getStorageData('todos');
+
+    setFullData(results);
+
+    makeSectionFunction(results);
+
   }, []);
 
   useEffect(() => {
@@ -144,7 +150,7 @@ const TodoListGroupScreen = () => {
   return (
     <SafeAreaView style={styles.wrapper}>
       <ReusableHeader
-        handleClick={handleClick}
+        handleClick={handleBackClick}
         handleAddTask={handleAddTask}
         centerText={'Todos'}
       />
@@ -226,6 +232,10 @@ const styles = StyleSheet.create({
     shadowRadius: 1,
     elevation: 1,
   },
+  listBox: {
+    width: '100%',
+    // position: 'absolute',
+  },
   dateText: {
     fontWeight: '600',
     fontSize: 16,
@@ -240,5 +250,27 @@ const styles = StyleSheet.create({
   },
   countText: {
     color: '#C4C4C4',
+  },
+
+  deleteBtn: {
+    position: 'absolute',
+    zIndex: 10,
+    width: 0,
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    right: 0,
+    opacity: 100,
+    borderRadius: 10,
+    // backgroundColor: 'red',
+    flexWrap: 'nowrap',
+  },
+  trashIcon: {
+    opacity: 0,
+  },
+  imgControl: {
+    backgroundColor: 'red',
+    width: 30,
+    height: 30,
   },
 });

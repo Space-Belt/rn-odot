@@ -1,5 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from 'react';
+
+import {ScrollView, StyleSheet} from 'react-native';
+import {Gesture} from 'react-native-gesture-handler';
+import {SetterOrUpdater} from 'recoil';
+import {ITodoItemList, useTodoList} from '../../../recoil/Todo';
 import {
   Image,
   ScrollView,
@@ -9,7 +14,9 @@ import {
   View,
 } from 'react-native';
 import {useTodoList} from '../../../recoil/Todo';
+
 import {ITodoItem, IWholeTodoList} from '../../../types/todos';
+import TodoRenderingList from './TodoRenderingList';
 
 
 import React from 'react';
@@ -30,8 +37,6 @@ type props = {
 };
 
 const TodoList = ({
-  odotList,
-  fullData,
   setOdotList,
   odotList,
   fullData,
@@ -52,7 +57,6 @@ const TodoList = ({
   const handleCheckTodoList = (i: number) => {
     let clonedFullData: IWholeTodoList = fullData;
     let clonedOdotList: ITodoItem[] = [...odotList];
-
     clonedOdotList[i] = {
       done: !clonedOdotList[i].done,
       todo: clonedOdotList[i].todo,
@@ -62,8 +66,37 @@ const TodoList = ({
     AsyncStorage.setItem('todos', JSON.stringify(clonedFullData));
   };
 
+  const handleDeleteTodoList = (listIndex: number) => {
+    let clonedData = [...odotList];
+    clonedData.splice(listIndex, 1);
+    let clonedFullData: IWholeTodoList = fullData;
+    console.log(listIndex);
+    console.log(clonedData);
+    setOdotList({
+      fullDate: `${thisYear}/${thisMonth}/${thisDay}`,
+      todos: clonedData,
+    });
+
+    if (clonedFullData[thisYear][thisMonth][thisDay].length < 2) {
+      delete clonedFullData[thisYear][thisMonth][thisDay];
+      AsyncStorage.setItem('todos', JSON.stringify(clonedFullData));
+    } else {
+      clonedFullData[thisYear][thisMonth][thisDay] = [...clonedData];
+      AsyncStorage.setItem('todos', JSON.stringify(clonedFullData));
+    }
+  };
+
+  const swipeGestureEvent = Gesture.Pan()
+    .onStart(() => {
+      console.log('dfdf');
+    })
+    .onUpdate(event => {
+      console.log(event.translationX);
+    });
+
   return (
     <ScrollView style={styles.scrollViewStyle}>
+
       {odotList.map((todo, i) => (
         <TouchableOpacity
           onPress={() => handleCheckTodoList(i)}
@@ -115,6 +148,7 @@ const TodoList = ({
 
   return (
     <ScrollView style={styles.scrollViewStyle}>
+
       {odotList?.map((todo, i) => (
         <TodoRenderingList
           key={i}
