@@ -9,9 +9,10 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
-import frame from '../assets/images/Frame.png';
 import moment from 'moment';
+import frame from '../assets/images/Frame.png';
 import {getStorageData} from '../lib/storage-helper';
 
 export interface Item {
@@ -54,11 +55,15 @@ const TodoListGroupScreen = () => {
   };
 
   const handleAddTask = () => {
-    navigation.navigate('AddTaskScreen', {
-      selectedYear: year,
-      selectedMonth: month,
-      selectedDate: date,
-    });
+    AsyncStorage.setItem(
+      'date',
+      JSON.stringify({
+        year: year,
+        month: month,
+        day: date,
+      }),
+    );
+    navigation.navigate('AddTaskScreen');
   };
   const [todoData, setTodoData] = useState<TempType[]>([]);
 
@@ -72,11 +77,15 @@ const TodoListGroupScreen = () => {
 
   const handleListClicked = (date: string) => {
     let [clickedYear, clickedMonth, clickedDate] = date.split('/');
-    navigation.navigate('TodoListScreen', {
-      selectedYear: clickedYear,
-      selectedMonth: clickedMonth,
-      selectedDate: clickedDate,
-    });
+    AsyncStorage.setItem(
+      'date',
+      JSON.stringify({
+        year: clickedYear,
+        month: clickedMonth,
+        day: clickedDate,
+      }),
+    );
+    navigation.navigate('TodoListScreen');
   };
 
   const keyExtractor = (item: TempType) =>
@@ -118,7 +127,6 @@ const TodoListGroupScreen = () => {
     const getData = async () => {
       let results = await getStorageData('todos');
 
-      console.log(results);
       let processedData = [];
       if (results !== null) {
         for (const [tempYear, tempMonths] of Object.entries(results)) {
@@ -142,7 +150,7 @@ const TodoListGroupScreen = () => {
           }
         }
       }
-      setTodoData(processedData);
+      setTodoData(processedData.reverse());
       setSections(createSections(processedData));
     };
     if (isFocused) {
