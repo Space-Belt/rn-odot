@@ -1,6 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
-import moment from 'moment';
 import React, {useEffect, useState} from 'react';
 import {
   SectionList,
@@ -15,6 +13,8 @@ import {useIsFocused, useNavigation} from '@react-navigation/native';
 import frame from '../assets/images/Frame.png';
 
 import {getStorageData} from '../lib/storage-helper';
+import {useTodoList} from '../recoil/Todo';
+import {ITodoItem} from '../types/todos';
 
 export interface Item {
   id: number;
@@ -22,21 +22,21 @@ export interface Item {
   date: string;
 }
 
-export interface ItemType {
+export interface IItemType {
   count: string;
   fullDate: string;
+  todos: ITodoItem[];
 }
 
 export interface SectionType {
   title: string;
-  data: ItemType[];
+  data: IItemType[];
 }
 
 const TodoListGroupScreen = () => {
   const navigation = useNavigation();
 
-  const today = moment().format('YYYY/MM/DD');
-  const [year, month, date] = today.split('/');
+  const {setTodos} = useTodoList();
 
   const [sections, setSections] = useState<SectionType[]>([]);
 
@@ -56,24 +56,15 @@ const TodoListGroupScreen = () => {
     );
   };
 
-  const handleListClicked = ({item}: {item: ItemType}) => {
-    let [clickedYear, clickedMonth, clickedDate] = date.split('/');
-    AsyncStorage.setItem(
-      'date',
-      JSON.stringify({
-        year: clickedYear,
-        month: clickedMonth,
-        day: clickedDate,
-      }),
-    );
-
+  const handleListClicked = (item: IItemType) => {
+    setTodos(item.fullDate, item.todos);
     navigation.navigate('TodoListScreen');
   };
 
-  const keyExtractor = (item: ItemType) =>
+  const keyExtractor = (item: IItemType) =>
     `section-list-item-=${item.fullDate}`;
 
-  const renderItem = ({item}: {item: ItemType}) => {
+  const renderItem = ({item}: {item: IItemType}) => {
     return (
       <TouchableOpacity
         onPress={() => handleListClicked(item)}
@@ -87,14 +78,12 @@ const TodoListGroupScreen = () => {
     );
   };
 
-  const createSections = (data: ItemType[]): SectionType[] => {
-    const nameObject: Record<string, ItemType[]> = {};
-    console.log(data);
+  const createSections = (datas: IItemType[]): SectionType[] => {
+    const nameObject: Record<string, IItemType[]> = {};
 
-    data.forEach(item => {
+    datas.forEach(item => {
       const firstLetter = item.fullDate.slice(0, 7);
       console.log(firstLetter);
-      // if (!firstLetter) return;
 
       if (!nameObject[firstLetter]) {
         nameObject[firstLetter] = [item];
@@ -138,15 +127,14 @@ const TodoListGroupScreen = () => {
             processedData.push({
               fullDate: dateInfo,
               count: `${doneCount}/${tempData.length}`,
+              todos: tempData,
             });
           }
         }
       }
-      console.log('여기');
-      console.log(processedData.reverse());
     }
 
-    setSections(createSections(processedData));
+    setSections(createSections(processedData.reverse()));
   }, []);
 
   useEffect(() => {

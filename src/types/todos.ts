@@ -1,4 +1,4 @@
-export interface IITodoItem {
+export interface ITodoItem {
   todo: string;
   done: boolean;
 }
@@ -8,11 +8,11 @@ export interface IDayTodoList {
 }
 
 export interface IMonthTodoList {
-  [key: string]: DayTodoList;
+  [key: string]: IDayTodoList;
 }
 
 export interface IYearTodoList {
-  [key: string]: MonthTodoList;
+  [key: string]: IMonthTodoList;
 }
 
 export interface IWholeTodoList {

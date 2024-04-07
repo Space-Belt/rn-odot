@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, {Dispatch, SetStateAction} from 'react';
+import React from 'react';
 import {
   Image,
   ScrollView,
@@ -8,11 +8,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {useTodoList} from '../../../recoil/Todo';
 import {ITodoItem, IWholeTodoList} from '../../../types/todos';
 
-type props = {
-  odotList: ITodoItem[];
-  setOdotList: Dispatch<SetStateAction<ITodoItem[]>>;
+
 import React from 'react';
 import {ScrollView, StyleSheet} from 'react-native';
 import {Gesture} from 'react-native-gesture-handler';
@@ -22,8 +21,8 @@ import {ITodoItem, IWholeTodoList} from '../../../types/todos';
 import TodoRenderingList from './TodoRenderingList';
 
 type props = {
-  setOdotList: SetterOrUpdater<ITodoItemList>;
   odotList: ITodoItem[];
+  setOdotList: Dispatch<SetStateAction<ITodoItem[]>>;
   fullData: IWholeTodoList;
   thisYear: string;
   thisMonth: string;
@@ -40,9 +39,12 @@ const TodoList = ({
   thisMonth,
   thisDay,
 }: props) => {
+  const {setTodos} = useTodoList();
+
   const handleCheckTodoList = (i: number) => {
     let clonedFullData: IWholeTodoList = fullData;
     let clonedOdotList: ITodoItem[] = [...odotList];
+
     clonedOdotList[i].done = !clonedOdotList[i].done;
     setOdotList(clonedOdotList);
   const {setTodos} = useTodoList();
@@ -50,6 +52,7 @@ const TodoList = ({
   const handleCheckTodoList = (i: number) => {
     let clonedFullData: IWholeTodoList = fullData;
     let clonedOdotList: ITodoItem[] = [...odotList];
+
     clonedOdotList[i] = {
       done: !clonedOdotList[i].done,
       todo: clonedOdotList[i].todo,
