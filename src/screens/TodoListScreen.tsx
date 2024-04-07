@@ -1,3 +1,4 @@
+import React, {useEffect, useState} from 'react';
 import {
   Image,
   SafeAreaView,
@@ -8,14 +9,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
 
-import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {TodoItem, WholeTodoList} from '../types/todos';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
+import moment from 'moment';
 import MainHeader from '../components/Headers/MainHeader';
 import {getStorageData} from '../lib/storage-helper';
-import moment from 'moment';
+import {TodoItem, WholeTodoList} from '../types/todos';
 
 const defaultParams = {
   selectedYear: '',
@@ -98,7 +98,7 @@ const TodoListScreen = () => {
   useEffect(() => {
     const getData = async () => {
       let results = await getStorageData('date');
-      console.log(results);
+
       if (results !== null) {
         setThisYear(results.year);
         setThitMonth(results.month);

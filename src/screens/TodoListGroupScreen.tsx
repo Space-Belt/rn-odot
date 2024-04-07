@@ -9,11 +9,11 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import {useIsFocused, useNavigation} from '@react-navigation/native';
-import frame from '../assets/images/Frame.png';
-import moment from 'moment';
-import {getStorageData} from '../lib/storage-helper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
+import moment from 'moment';
+import frame from '../assets/images/Frame.png';
+import {getStorageData} from '../lib/storage-helper';
 
 export interface Item {
   id: number;
@@ -127,7 +127,6 @@ const TodoListGroupScreen = () => {
     const getData = async () => {
       let results = await getStorageData('todos');
 
-      console.log(results);
       let processedData = [];
       if (results !== null) {
         for (const [tempYear, tempMonths] of Object.entries(results)) {
