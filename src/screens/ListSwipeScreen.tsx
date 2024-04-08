@@ -105,27 +105,6 @@ const ListSwipeScreen = () => {
       </Swipeable>
     );
   };
-  // const solution = (n: number) => {
-  //   var answer = 0;
-  //   let even = n % 2 === 0 ? true : false;
-  //   if (even) {
-  //     for (let i = 2; i <= n; i + 2) {
-  //       if (n % i === 0) {
-  //         answer += i * i;
-  //       }
-  //     }
-  //   } else {
-  //     for (let i = 1; i <= n; i + 2) {
-  //       answer += i;
-  //     }
-  //   }
-  //   console.log(answer);
-  //   return answer;
-  // };
-  // React.useEffect(() => {
-  //   console.log('dfdfdf');
-  //   solution(7);
-  // }, []);
 
   return (
     <SafeAreaView style={styles.safeWrapper}>

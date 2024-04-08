@@ -1,4 +1,3 @@
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import React from 'react';
@@ -10,25 +9,18 @@ import {
   TouchableHighlight,
   View,
 } from 'react-native';
-import { useRecoilState } from 'recoil';
-import { getStorageData } from '../../lib/storage-helper';
+import {useRecoilState} from 'recoil';
+import {getStorageData} from '../../lib/storage-helper';
 
-import { useBottomSheet } from '../../recoil/BottomSheetStore';
-import { useToast } from '../../recoil/ToastStore';
-import { todoList } from '../../recoil/Todo';
-import { ITodoItem, IWholeTodoList } from '../../types/todos';
-
-
-
-
-
+import {useBottomSheet} from '../../recoil/BottomSheetStore';
+import {useToast} from '../../recoil/ToastStore';
+import {todoList} from '../../recoil/Todo';
+import {ITodoItem, IWholeTodoList} from '../../types/todos';
 
 const NewTaskBottomsheet = () => {
   const {showToast} = useToast();
   const {hideBottomSheet} = useBottomSheet();
   const [recoilTodo, setRecoilTodo] = useRecoilState(todoList);
-
-
 
   const [thisYear, setThisYear] = React.useState<string>('');
   const [thisMonth, setThitMonth] = React.useState<string>('');
@@ -39,10 +31,7 @@ const NewTaskBottomsheet = () => {
   const [todo, setTodo] = React.useState<string>('');
 
   const addTodoList = () => {
-
-
     let clonedData: IWholeTodoList = todoGroup;
-
 
     if (Object.keys(clonedData).length !== 0) {
       if (todo.length > 0) {
@@ -81,14 +70,6 @@ const NewTaskBottomsheet = () => {
           let tempRecoilTodo: ITodoItem[] =
             recoilTodo.todos !== undefined ? [...recoilTodo.todos] : [];
 
-
-          showToast('오늘할일을 꼭 마무리 하십쇼.', 'success');
-          hideBottomSheet();
-        } else {
-          let tempRecoilTodo: ITodoItem[] =
-            recoilTodo.todos !== undefined ? [...recoilTodo.todos] : [];
-          
-
           clonedData[thisYear][thisMonth][thisDay] = [
             {todo: todo, done: false},
           ];
@@ -102,19 +83,17 @@ const NewTaskBottomsheet = () => {
             todos: tempRecoilTodo,
           });
         }
-      } 
       } else {
         showToast('한글자 이상 부터 등록됩니다.', 'error');
 
-          showToast('오늘 첫 할일 등록했습니다. 화이팅!!', 'success');
-          hideBottomSheet();
+        showToast('오늘 첫 할일 등록했습니다. 화이팅!!', 'success');
+        hideBottomSheet();
 
-          setRecoilTodo({
-            fullDate: `${thisYear}/${thisMonth}/${thisDay}`,
-            todos: tempRecoilTodo,
-          });
-        
-      } 
+        setRecoilTodo({
+          fullDate: `${thisYear}/${thisMonth}/${thisDay}`,
+          todos: tempRecoilTodo,
+        });
+      }
     } else {
       clonedData[thisYear] = {};
       clonedData[thisYear][thisMonth] = {};
@@ -151,7 +130,6 @@ const NewTaskBottomsheet = () => {
   }, []);
 
   React.useEffect(() => {
-
     if (recoilTodo.fullDate !== '') {
       let [y, m, d] = recoilTodo.fullDate.split('/');
       setThisYear(y);
@@ -163,7 +141,6 @@ const NewTaskBottomsheet = () => {
       setThisDay(moment().format('DD'));
     }
   }, [recoilTodo]);
-
 
   return (
     <View style={styles.wrapper}>
