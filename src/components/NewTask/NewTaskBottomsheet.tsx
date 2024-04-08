@@ -10,24 +10,16 @@ import {
   TouchableHighlight,
   View,
 } from 'react-native';
-import {useRecoilState} from 'recoil';
-import {getStorageData} from '../../lib/storage-helper';
+import { useRecoilState } from 'recoil';
+import { getStorageData } from '../../lib/storage-helper';
 
-import {useBottomSheet} from '../../recoil/BottomSheetStore';
-import {useToast} from '../../recoil/ToastStore';
-import {todoList} from '../../recoil/Todo';
-import {ITodoItem, IWholeTodoList} from '../../types/todos';
+import { useBottomSheet } from '../../recoil/BottomSheetStore';
+import { useToast } from '../../recoil/ToastStore';
+import { todoList } from '../../recoil/Todo';
+import { ITodoItem, IWholeTodoList } from '../../types/todos';
 
 
-import {WholeTodoList} from '../../types/todos';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import {useRecoilState} from 'recoil';
-import {getStorageData} from '../../lib/storage-helper';
-import {useBottomSheet} from '../../recoil/BottomSheetStore';
-import {useToast} from '../../recoil/ToastStore';
-import {todoList} from '../../recoil/Todo';
-import {ITodoItem, IWholeTodoList} from '../../types/todos';
 
 
 
@@ -36,7 +28,6 @@ const NewTaskBottomsheet = () => {
   const {hideBottomSheet} = useBottomSheet();
   const [recoilTodo, setRecoilTodo] = useRecoilState(todoList);
 
-  const [recoilTodo, setRecoilTodo] = useRecoilState(todoList);
 
 
   const [thisYear, setThisYear] = React.useState<string>('');
@@ -111,14 +102,9 @@ const NewTaskBottomsheet = () => {
             todos: tempRecoilTodo,
           });
         }
+      } 
       } else {
         showToast('한글자 이상 부터 등록됩니다.', 'error');
-          
-          showToast('오늘 첫 할일 등록했습니다. 화이팅!!', 'dkdk', 'success');
-          hideBottomSheet();
-        }
-      } else {
-        showToast('한글자 이상 부터 등록됩니다.', '', 'error');
 
           showToast('오늘 첫 할일 등록했습니다. 화이팅!!', 'success');
           hideBottomSheet();
@@ -127,11 +113,8 @@ const NewTaskBottomsheet = () => {
             fullDate: `${thisYear}/${thisMonth}/${thisDay}`,
             todos: tempRecoilTodo,
           });
-        }
-      } else {
-        showToast('한글자 이상 부터 등록됩니다.', 'error');
-
-      }
+        
+      } 
     } else {
       clonedData[thisYear] = {};
       clonedData[thisYear][thisMonth] = {};

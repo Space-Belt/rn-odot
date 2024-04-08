@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {
   Image,
   SafeAreaView,
@@ -8,16 +8,13 @@ import {
   View,
 } from 'react-native';
 
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useIsFocused, useNavigation} from '@react-navigation/native';
+import {useIsFocused} from '@react-navigation/native';
 
 import MainHeader from '../components/Headers/MainHeader';
 import NewTaskBottomsheet from '../components/NewTask/NewTaskBottomsheet';
 
 import moment from 'moment';
-import {useRecoilState} from 'recoil';
-import {useRecoilValue} from 'recoil';
+import {useRecoilState, useRecoilValue} from 'recoil';
 import TodoList from '../components/Todo/List/TodoList';
 import ProgressBar from '../components/Todo/Progress/ProgressBar';
 import {getStorageData} from '../lib/storage-helper';
@@ -27,14 +24,11 @@ import {useToast} from '../recoil/ToastStore';
 import {todoList} from '../recoil/Todo';
 import {IWholeTodoList} from '../types/todos';
 
-import {TodoItem, WholeTodoList} from '../types/todos';
-
 const defaultParams = {
   selectedYear: '',
   selectedMonth: '',
   selectedDate: '',
 };
-
 
 const TodoListScreen = () => {
   const isFocused = useIsFocused();
@@ -52,18 +46,15 @@ const TodoListScreen = () => {
       : [moment().format('YYYY'), moment().format('MM'), moment().format('DD')];
   const todoItem = useRecoilValue(todoList);
 
-
   const [fullData, setFullData] = React.useState<IWholeTodoList>({});
 
   const handlePlusClick = () => {
     showBottomSheet(<NewTaskBottomsheet />);
   };
 
-
   const totalCount = todoItem.todos ? todoItem?.todos?.length : 1;
   const doneCount = todoItem
     ? todoItem.todos?.filter(list => list.done).length
-
     : 1;
   const percentageWidth = (doneCount / totalCount) * 100;
 
@@ -80,27 +71,27 @@ const TodoListScreen = () => {
     setFullData(results);
   };
 
-  useEffect(() => {
+  // useEffect(() => {
 
-    const getData = async () => {
-      let results = await getStorageData('date');
+  //   const getData = async () => {
+  //     let results = await getStorageData('date');
 
-      if (results !== null) {
-        setThisYear(results.year);
-        setThitMonth(results.month);
-        setThisDay(results.day);
-      } else {
-        setThisYear(moment().format('YYYY'));
-        setThitMonth(moment().format('MM'));
-        setThisDay(moment().format('DD'));
-      }
-      getDatas(results.year, results.month, results.day);
-    };
+  //     if (results !== null) {
+  //       setThisYear(results.year);
+  //       setThitMonth(results.month);
+  //       setThisDay(results.day);
+  //     } else {
+  //       setThisYear(moment().format('YYYY'));
+  //       setThitMonth(moment().format('MM'));
+  //       setThisDay(moment().format('DD'));
+  //     }
+  //     getDatas(results.year, results.month, results.day);
+  //   };
 
-    if (isFocused || isVisible === true) {
-      getDatas();
-    }
-  }, [isFocused, isVisible]);
+  //   if (isFocused || isVisible === true) {
+  //     getDatas();
+  //   }
+  // }, [isFocused, isVisible]);
 
   return (
     <View style={styles.wrapper}>
@@ -113,7 +104,6 @@ const TodoListScreen = () => {
               ? `${thisYear}/${thisMonth}/${thisDay}`
               : todoItem.fullDate}
           </Text>
-
         </View>
         <ProgressBar
           percentageWidth={percentageWidth}
