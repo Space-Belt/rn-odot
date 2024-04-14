@@ -54,8 +54,7 @@ const TodoList = ({
     let clonedData = [...odotList];
     clonedData.splice(listIndex, 1);
     let clonedFullData: IWholeTodoList = fullData;
-    console.log(listIndex);
-    console.log(clonedData);
+    
     setOdotList({
       fullDate: `${thisYear}/${thisMonth}/${thisDay}`,
       todos: clonedData,
@@ -72,10 +71,10 @@ const TodoList = ({
 
   const swipeGestureEvent = Gesture.Pan()
     .onStart(() => {
-      console.log('dfdf');
+      
     })
     .onUpdate(event => {
-      console.log(event.translationX);
+      
     });
 
   // return (

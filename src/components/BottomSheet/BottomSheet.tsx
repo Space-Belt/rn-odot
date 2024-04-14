@@ -49,7 +49,6 @@ const BottomSheet = () => {
       // translateY.value = bottomSheetHeight;
       // sheetHeight.value = bottomSheetHeight;
     } else if (screenHeight <= sheetHeight.value) {
-      console.log(statusBarHeight);
       sheetHeight.value = withSpring(screenHeight - statusBarHeight);
 
       return {
@@ -93,11 +92,6 @@ const BottomSheet = () => {
       };
     }
   }, [isVisible.isBottomSheetVisible]);
-
-  React.useEffect(() => {
-    console.log('dfdfdfdfdf');
-    console.log(sheetHeight.value);
-  }, [sheetHeight.value]);
 
   React.useEffect(() => {
     const handlePressBackButton = () => {

@@ -67,7 +67,6 @@ const ListSwipeScreen = () => {
     dragValue: AnimatedInterpolation,
     id: number,
   ) => {
-    // console.log(progress, dragValue);
     const opacity = dragValue.interpolate({
       inputRange: [-100, 0],
       outputRange: [1, 0],

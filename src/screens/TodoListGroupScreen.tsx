@@ -80,7 +80,7 @@ const TodoListGroupScreen = () => {
         for (const [tempMonth, tempDays] of Object.entries(
           tempMonths as {[key: string]: any},
         )) {
-          console.log(tempDays);
+          
           for (const [todo, todos] of Object.entries(
             tempDays as {[key: string]: {done: boolean; todo: string}[]},
           )) {

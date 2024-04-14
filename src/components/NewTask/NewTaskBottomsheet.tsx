@@ -119,7 +119,6 @@ const NewTaskBottomsheet = () => {
       let results = await getStorageData('todos');
 
       if (results === null) {
-        console.log(results);
         setTodoGroup({});
       } else {
         setTodoGroup(results);
