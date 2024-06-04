@@ -113,7 +113,7 @@ const TodoListGroupScreen = () => {
 
   const handleListClicked = (item: IItemType) => {
     setTodos(item.fullDate, item.todos);
-    navigation.navigate('TodoListScreen');
+    navigation.navigate('TodoListScreen' as never);
 
   };
 
