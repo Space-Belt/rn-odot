@@ -77,34 +77,7 @@ const TodoList = ({
       
     });
 
-  // return (
-  //   <ScrollView style={styles.scrollViewStyle}>
 
-  //     {odotList.map((todo, i) => (
-  //       <TouchableOpacity
-  //         onPress={() => handleCheckTodoList(i)}
-  //         key={`todos-${i}`}>
-  //         <View
-  //           style={[
-  //             styles.todo,
-  //             odotList.length - 1 === i ? {marginBottom: 10} : {},
-  //           ]}>
-  //           {todo.done !== undefined && todo.done !== false ? (
-  //             <Image
-  //               style={styles.checkImg}
-  //               source={require('../../../assets/images/checked.png')}
-  //             />
-  //           ) : (
-  //             <Image
-  //               style={styles.checkImg}
-  //               source={require('../../../assets/images/unchecked.png')}
-  //             />
-  //           )}
-  //           <View style={styles.todoStyle}>
-  //             <Text>{todo.todo}</Text>
-  //           </View>
-  //         </View>
-  //       </TouchableOpacity>
         
   const handleDeleteTodoList = (listIndex: number) => {
     let clonedData = [...odotList];

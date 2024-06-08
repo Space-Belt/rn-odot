@@ -121,12 +121,6 @@ const TodoRenderingList = ({
         deleteBtnWidth.value = 0;
         runOnJS(handleDeleteTodoList)(index);
       }
-      //  else {
-      //   tempDeleteBtnWidth.value = 0;
-      //   deletBtnOpacity.value = 1;
-      //   translateX.value = -100;
-      //   deleteBtnWidth.value = 100;
-      // }
     });
 
   const isFocus = useIsFocused();

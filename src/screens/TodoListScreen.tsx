@@ -36,8 +36,6 @@ const TodoListScreen = () => {
   const {showBottomSheet} = useBottomSheet();
 
   const {isVisible} = useToast();
-
-  // const todoItem = useRecoilValue(todoList);
   const [todoItem, setTodoItem] = useRecoilState(todoList);
 
   const [thisYear, thisMonth, thisDay] =
@@ -70,28 +68,6 @@ const TodoListScreen = () => {
     });
     setFullData(results);
   };
-
-  // useEffect(() => {
-
-  //   const getData = async () => {
-  //     let results = await getStorageData('date');
-
-  //     if (results !== null) {
-  //       setThisYear(results.year);
-  //       setThitMonth(results.month);
-  //       setThisDay(results.day);
-  //     } else {
-  //       setThisYear(moment().format('YYYY'));
-  //       setThitMonth(moment().format('MM'));
-  //       setThisDay(moment().format('DD'));
-  //     }
-  //     getDatas(results.year, results.month, results.day);
-  //   };
-
-  //   if (isFocused || isVisible === true) {
-  //     getDatas();
-  //   }
-  // }, [isFocused, isVisible]);
 
   return (
     <View style={styles.wrapper}>
