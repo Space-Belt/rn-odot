@@ -140,7 +140,9 @@ const TodoRenderingList = ({
           <Animated.View
             style={[
               styles.todo,
-              odotList.length - 1 === index ? {marginBottom: 10} : {},
+              odotList.length - 1 === index && odotList.length !== 0
+                ? {marginBottom: 10}
+                : {},
               listAnimatedStyle,
             ]}>
             {todo.done !== undefined && todo.done !== false ? (

@@ -14,7 +14,7 @@ import MainHeader from '../components/Headers/MainHeader';
 import NewTaskBottomsheet from '../components/NewTask/NewTaskBottomsheet';
 
 import moment from 'moment';
-import {useRecoilState, useRecoilValue} from 'recoil';
+import {useRecoilState} from 'recoil';
 import TodoList from '../components/Todo/List/TodoList';
 import ProgressBar from '../components/Todo/Progress/ProgressBar';
 import {getStorageData} from '../lib/storage-helper';
@@ -42,7 +42,6 @@ const TodoListScreen = () => {
     todoItem.fullDate !== ''
       ? todoItem.fullDate.split('/')
       : [moment().format('YYYY'), moment().format('MM'), moment().format('DD')];
-  const todoItem = useRecoilValue(todoList);
 
   const [fullData, setFullData] = React.useState<IWholeTodoList>({});
 
@@ -58,16 +57,30 @@ const TodoListScreen = () => {
 
   const getDatas = async () => {
     let results = await getStorageData('todos');
-
+    console.log(JSON.stringify(results, null, 2));
     if (results === null) {
-      return;
+      setTodoItem({
+        fullDate: `${thisYear}/${thisMonth}/${thisDay}`,
+        todos: [],
+      });
+    } else {
+      setTodoItem({
+        fullDate: `${thisYear}/${thisMonth}/${thisDay}`,
+        todos: results[thisYear][thisMonth][thisDay],
+      });
+      setFullData(results);
     }
-    setTodoItem({
-      fullDate: `${thisYear}/${thisMonth}/${thisDay}`,
-      todos: results[thisYear][thisMonth][thisDay],
-    });
-    setFullData(results);
   };
+
+  React.useEffect(() => {
+    if (isFocused) {
+      getDatas();
+    }
+  }, []);
+  React.useEffect(() => {
+    console.log('dfsdfsf');
+    console.log(todoItem);
+  }, [todoItem]);
 
   return (
     <View style={styles.wrapper}>
@@ -97,6 +110,7 @@ const TodoListScreen = () => {
         />
         <TouchableHighlight
           onPress={handlePlusClick}
+          // onPress={() => clearStorageData()}
           style={styles.plusWrapper}
           underlayColor="transparent">
           <Image

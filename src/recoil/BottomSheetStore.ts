@@ -10,6 +10,7 @@ export interface IBottomSheet {
 const initialBottomVisible: IBottomSheetVisible = {
   isBottomSheetVisible: false,
 };
+
 const initialBottomState: IBottomSheet = {
   content: null,
 };

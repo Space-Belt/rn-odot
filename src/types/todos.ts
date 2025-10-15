@@ -30,3 +30,20 @@ export interface TodoGroup {
 export interface ITodoList {
   [key: string]: ITodoItem[];
 }
+
+export interface Item {
+  id: number;
+  title: string;
+  date: string;
+}
+
+export interface IItemType {
+  count: string;
+  fullDate: string;
+  todos: ITodoItem[];
+}
+
+export interface SectionType {
+  title: string;
+  data: IItemType[];
+}
