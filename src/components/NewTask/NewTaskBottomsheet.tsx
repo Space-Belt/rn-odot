@@ -22,9 +22,12 @@ const NewTaskBottomsheet = () => {
   const {hideBottomSheet} = useBottomSheet();
   const [recoilTodo, setRecoilTodo] = useRecoilState(todoList);
 
-  const [thisYear, setThisYear] = React.useState<string>('');
-  const [thisMonth, setThitMonth] = React.useState<string>('');
-  const [thisDay, setThisDay] = React.useState<string>('');
+  const [todoItem, setTodoItem] = useRecoilState(todoList);
+
+  const [thisYear, thisMonth, thisDay] =
+    todoItem.fullDate !== ''
+      ? todoItem.fullDate.split('/')
+      : [moment().format('YYYY'), moment().format('MM'), moment().format('DD')];
 
   const [todoGroup, setTodoGroup] = React.useState<IWholeTodoList>({});
 
@@ -73,6 +76,10 @@ const NewTaskBottomsheet = () => {
           clonedData[thisYear][thisMonth][thisDay] = [
             {todo: todo, done: false},
           ];
+          tempRecoilTodo.push({
+            todo: todo,
+            done: false,
+          });
           AsyncStorage.setItem('todos', JSON.stringify(clonedData));
           setTodo('');
           showToast('오늘 첫 할일 등록했습니다. 화이팅!!', 'success');
@@ -86,13 +93,13 @@ const NewTaskBottomsheet = () => {
       } else {
         showToast('한글자 이상 부터 등록됩니다.', 'error');
 
-        showToast('오늘 첫 할일 등록했습니다. 화이팅!!', 'success');
+        // showToast('오늘 첫 할일 등록했습니다. 화이팅!!', 'success');
         hideBottomSheet();
 
-        setRecoilTodo({
-          fullDate: `${thisYear}/${thisMonth}/${thisDay}`,
-          todos: tempRecoilTodo,
-        });
+        // setRecoilTodo({
+        //   fullDate: `${thisYear}/${thisMonth}/${thisDay}`,
+        //   todos: tempRecoilTodo,
+        // });
       }
     } else {
       clonedData[thisYear] = {};
@@ -103,7 +110,17 @@ const NewTaskBottomsheet = () => {
           done: false,
         },
       ];
+      let tempRecoilTodo: ITodoItem[] =
+        recoilTodo.todos !== undefined ? [...recoilTodo.todos] : [];
+      tempRecoilTodo.push({
+        todo: todo,
+        done: false,
+      });
       AsyncStorage.setItem('todos', JSON.stringify(clonedData));
+      setRecoilTodo({
+        fullDate: `${thisYear}/${thisMonth}/${thisDay}`,
+        todos: tempRecoilTodo,
+      });
       setTodo('');
       showToast('할일 등록 성공!! 오늘도 화이팅', 'success');
       hideBottomSheet();
@@ -118,7 +135,7 @@ const NewTaskBottomsheet = () => {
     const getData = async () => {
       let results = await getStorageData('todos');
 
-      if (results === null) {
+      if (results === null || results === undefined) {
         setTodoGroup({});
       } else {
         setTodoGroup(results);
@@ -128,18 +145,23 @@ const NewTaskBottomsheet = () => {
     getData();
   }, []);
 
+  // React.useEffect(() => {
+  //   console.log(recoilTodo);
+  //   if (recoilTodo.fullDate !== '') {
+  //     let [y, m, d] = recoilTodo.fullDate.split('/');
+  //     setThisYear(y);
+  //     setThisMonth(m);
+  //     setThisDay(d);
+  //   } else {
+  //     setThisMonth(moment().format('MM'));
+  //     setThisYear(moment().format('YYYY'));
+  //     setThisDay(moment().format('DD'));
+  //   }
+  // }, [recoilTodo]);
+
   React.useEffect(() => {
-    if (recoilTodo.fullDate !== '') {
-      let [y, m, d] = recoilTodo.fullDate.split('/');
-      setThisYear(y);
-      setThitMonth(m);
-      setThisDay(d);
-    } else {
-      setThisYear(moment().format('YYYY'));
-      setThitMonth(moment().format('MM'));
-      setThisDay(moment().format('DD'));
-    }
-  }, [recoilTodo]);
+    console.log(thisDay, thisMonth, thisYear);
+  }, [thisDay, thisMonth, thisYear]);
 
   return (
     <View style={styles.wrapper}>
