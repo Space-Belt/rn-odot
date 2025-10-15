@@ -12,9 +12,11 @@
 ### 화면
 
 <div style="display: flex; justify-content: space-around">
-  <image src="https://github-production-user-asset-6210df.s3.amazonaws.com/82592845/501362981-77b6935d-853b-438f-86a2-4e3a7951a1b8.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20251015%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251015T080231Z&X-Amz-Expires=300&X-Amz-Signature=8246fba00fd9f8a2141495ba0c668c93fee5398854b762a0e1d5e7b0814573bf&X-Amz-SignedHeaders=host" style="width: 33%;" />
-  <image src="https://github-production-user-asset-6210df.s3.amazonaws.com/82592845/501364803-77905d2d-3138-4562-abb0-fbb0d42c321f.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20251015%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251015T080439Z&X-Amz-Expires=300&X-Amz-Signature=c9ae337c8b5391925041329727260e4153dd27ff71c78b8b2ee3763c6fde1205&X-Amz-SignedHeaders=host" style="width: 33%;" />
-  <image src="https://github-production-user-asset-6210df.s3.amazonaws.com/82592845/501369395-16d80c6c-ebd9-4248-ba14-aeb9e93c1f80.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20251015%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251015T081251Z&X-Amz-Expires=300&X-Amz-Signature=0bee8b28b71c14d6df5e479bb2cf6ff36a3929519e5ce752c53b36587f084078&X-Amz-SignedHeaders=host" style="width: 33%;" />
+ <!-- <img src="https://github-production-user-asset-6210df.s3.amazonaws.com/82592845/501362981-77b6935d-853b-438f-86a2-4e3a7951a1b8.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20251015%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251015T080231Z&X-Amz-Expires=300&X-Amz-Signature=8246fba00fd9f8a2141495ba0c668c93fee5398854b762a0e1d5e7b0814573bf&X-Amz-SignedHeaders=host" width="300px" /> -->
+  
+  <img src="https://github.com/user-attachments/assets/2e8d58fc-6ffb-4234-9073-a8a914a41d75" width="30%" />
+  <img src="https://github.com/user-attachments/assets/40e29127-7599-4aca-9aa5-3a18a6e8083b" width="30%" />
+  <img src="https://github.com/user-attachments/assets/68e97f39-7c2a-471b-9805-09f4abf10326" width="30%" />
 </div>
 
 ### 구현
