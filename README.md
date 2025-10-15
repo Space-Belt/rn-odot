@@ -1,79 +1,38 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+## 할일 관리
 
-# Getting Started
+### 스택
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+[REACT NATIVE]
 
-## Step 1: Start the Metro Server
+### 시작 방법
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+1. `yarn start`
+2. 또 다른 터미널 `yarn start ios`
 
-To start Metro, run the following command from the _root_ of your React Native project:
+### 화면
 
-```bash
-# using npm
-npm start
+<div style="display: flex; justify-content: space-around">
+  <image src="https://github-production-user-asset-6210df.s3.amazonaws.com/82592845/501362981-77b6935d-853b-438f-86a2-4e3a7951a1b8.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20251015%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251015T080231Z&X-Amz-Expires=300&X-Amz-Signature=8246fba00fd9f8a2141495ba0c668c93fee5398854b762a0e1d5e7b0814573bf&X-Amz-SignedHeaders=host" style="width: 33%;" />
+  <image src="https://github-production-user-asset-6210df.s3.amazonaws.com/82592845/501364803-77905d2d-3138-4562-abb0-fbb0d42c321f.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20251015%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251015T080439Z&X-Amz-Expires=300&X-Amz-Signature=c9ae337c8b5391925041329727260e4153dd27ff71c78b8b2ee3763c6fde1205&X-Amz-SignedHeaders=host" style="width: 33%;" />
+  <image src="https://github-production-user-asset-6210df.s3.amazonaws.com/82592845/501369395-16d80c6c-ebd9-4248-ba14-aeb9e93c1f80.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20251015%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251015T081251Z&X-Amz-Expires=300&X-Amz-Signature=0bee8b28b71c14d6df5e479bb2cf6ff36a3929519e5ce752c53b36587f084078&X-Amz-SignedHeaders=host" style="width: 33%;" />
+</div>
 
-# OR using Yarn
-yarn start
-```
+### 구현
 
-## Step 2: Start your Application
+1. 할일
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+- 기본적으로 오늘의 투두리스트가 처음으로 보여집니다.
+- (+) 아이콘 클릭 시, 등록 가능한 모달이 노출됩니다.
+- 할일을 입력하고 Add Task 클릭 시 스토리지에 저장됩니다.
+- 할일을 스와이프 하면 삭제 버튼이 노출되며, 일정수준 이상 스와이프하게 되면 자동으로 삭제가 진행됩니다.
 
-### For Android
+2. 바텀시트
 
-```bash
-# using npm
-npm run android
+- 전역에서 사용가능한 형태로 최상단 루트에 존재합니다.
+- 이는 Recoil 상태를 이용하여, 보여지고, 원한다면 바텀시트안의 content도 지정하여 커스텀 가능합니다.
+- 직접 슬라이드하여 영역을 올리거나 내릴수 있습니다.
 
-# OR using Yarn
-yarn android
-```
+3. SectionList
 
-### For iOS
-
-```bash
-# using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
-
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
-
-## Step 3: Modifying your App
-
-Now that you have successfully run the app, let's modify it.
-
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
-
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+- SectionList를 활용하여, 각년도의 월별로 표시 가능하게 했습니다.
+- 이 또한, 스와이프로 삭제가 가능하며, 이를 통해 투두 리스트에 들어간다면, 해당 일자의 TodoList가 노출됩니다.
